@@ -67,22 +67,22 @@ export default function Demographics() {
     <DashboardLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Demographics</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Demografie</h1>
           <p className="text-muted-foreground mt-2">
-            User demographics and distribution analysis
+            Gebruikersdemografie en verdelingsanalyse
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Age Group Distribution</CardTitle>
-              <CardDescription>Users by age group</CardDescription>
+              <CardTitle>Leeftijdsgroep Verdeling</CardTitle>
+              <CardDescription>Gebruikers per leeftijdsgroep</CardDescription>
             </CardHeader>
             <CardContent>
               {ageLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Loading...</div>
+                  <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>
               ) : ageGroupData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -106,7 +106,7 @@ export default function Demographics() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  No data available
+                  Geen gegevens beschikbaar
                 </div>
               )}
             </CardContent>
@@ -114,13 +114,13 @@ export default function Demographics() {
 
           <Card>
             <CardHeader>
-              <CardTitle>User Type Distribution</CardTitle>
+              <CardTitle>Gebruikerstype Verdeling</CardTitle>
               <CardDescription>Jongere vs Ouder</CardDescription>
             </CardHeader>
             <CardContent>
               {userTypesLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Loading...</div>
+                  <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>
               ) : userTypeData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -144,7 +144,7 @@ export default function Demographics() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  No data available
+                  Geen gegevens beschikbaar
                 </div>
               )}
             </CardContent>
@@ -152,13 +152,13 @@ export default function Demographics() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Family Type Distribution</CardTitle>
-              <CardDescription>For parent users</CardDescription>
+              <CardTitle>Gezinstype Verdeling</CardTitle>
+              <CardDescription>Voor oudergebruikers</CardDescription>
             </CardHeader>
             <CardContent>
               {familyTypesLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Loading...</div>
+                  <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>
               ) : familyTypeData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -178,7 +178,7 @@ export default function Demographics() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  No data available
+                  Geen gegevens beschikbaar
                 </div>
               )}
             </CardContent>
@@ -186,13 +186,13 @@ export default function Demographics() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Top Postal Code Areas</CardTitle>
-              <CardDescription>Geographic distribution (top 20)</CardDescription>
+              <CardTitle>Top Postcodegebieden</CardTitle>
+              <CardDescription>Geografische verspreiding (top 20)</CardDescription>
             </CardHeader>
             <CardContent>
               {postalLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Loading...</div>
+                  <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>
               ) : postalCodeData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -212,7 +212,7 @@ export default function Demographics() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  No data available
+                  Geen gegevens beschikbaar
                 </div>
               )}
             </CardContent>
@@ -221,8 +221,8 @@ export default function Demographics() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Theme Frequency Analysis</CardTitle>
-            <CardDescription>Top 10 most discussed themes</CardDescription>
+            <CardTitle>Thema Frequentie Analyse</CardTitle>
+            <CardDescription>Top 10 meest besproken thema's</CardDescription>
           </CardHeader>
           <CardContent>
             {themesLoading ? (
@@ -243,7 +243,7 @@ export default function Demographics() {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="value" fill="#f59e0b" name="Occurrences" />
+                  <Bar dataKey="value" fill="#f59e0b" name="Voorkomens" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (

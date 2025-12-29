@@ -26,7 +26,7 @@ export default function RiskAssessment() {
   const riskTimeSeriesData = useMemo(() => {
     if (!riskMetrics) return [];
     return riskMetrics.map((item) => ({
-      date: new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: new Date(item.date).toLocaleDateString("nl-NL", { month: "short", day: "numeric" }),
       highRisk: Number(item.highRiskCount),
       safetySignals: Number(item.safetySignalCount),
       total: Number(item.totalCount),
@@ -62,58 +62,58 @@ export default function RiskAssessment() {
     <DashboardLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Risk Assessment</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Risicobeoordeling</h1>
           <p className="text-muted-foreground mt-2">
-            Monitor high-risk users, safety signals, and referral patterns
+            Monitor hoog-risico gebruikers, veiligheidssignalen en verwijzingspatronen
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">High Risk Users</CardTitle>
+              <CardTitle className="text-sm font-medium">Hoog Risico Gebruikers</CardTitle>
               <AlertTriangle className="h-4 w-4 text-yellow-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalHighRisk.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Users with 3+ themes</p>
+              <p className="text-xs text-muted-foreground mt-1">Gebruikers met 3+ thema's</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Safety Signals</CardTitle>
+              <CardTitle className="text-sm font-medium">Veiligheidssignalen</CardTitle>
               <Shield className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-destructive">{totalSafetySignals.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">Urgent intervention needed</p>
+              <p className="text-xs text-muted-foreground mt-1">Dringende interventie nodig</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Improvement Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">Verbeteringspercentage</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-500">
                 {summary?.improvementRate?.toFixed(1) ?? "0"}%
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Self-reported improvement</p>
+              <p className="text-xs text-muted-foreground mt-1">Zelfgerapporteerde verbetering</p>
             </CardContent>
           </Card>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Risk Trend Analysis</CardTitle>
-            <CardDescription>High-risk users and safety signals over time</CardDescription>
+            <CardTitle>Risico Trend Analyse</CardTitle>
+            <CardDescription>Hoog-risico gebruikers en veiligheidssignalen over tijd</CardDescription>
           </CardHeader>
           <CardContent>
             {riskLoading ? (
               <div className="h-[400px] flex items-center justify-center">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
+                <div className="animate-pulse text-muted-foreground">Laden...</div>
               </div>
             ) : riskTimeSeriesData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
@@ -145,7 +145,7 @@ export default function RiskAssessment() {
                     stroke="#f59e0b"
                     fillOpacity={1}
                     fill="url(#colorHighRisk)"
-                    name="High Risk Users"
+                    name="Hoog Risico Gebruikers"
                   />
                   <Area
                     type="monotone"
@@ -153,13 +153,13 @@ export default function RiskAssessment() {
                     stroke="#ef4444"
                     fillOpacity={1}
                     fill="url(#colorSafety)"
-                    name="Safety Signals"
+                    name="Veiligheidssignalen"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[400px] flex items-center justify-center text-muted-foreground">
-                No data available
+                  Geen gegevens beschikbaar
               </div>
             )}
           </CardContent>
@@ -168,13 +168,13 @@ export default function RiskAssessment() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Referral Distribution</CardTitle>
-              <CardDescription>Breakdown by referral type</CardDescription>
+              <CardTitle>Verwijzingsverdeling</CardTitle>
+              <CardDescription>Verwijzingstypes en gemiddelde tijd tot verwijzing</CardDescription>
             </CardHeader>
             <CardContent>
               {referralsLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Loading...</div>
+                  <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>
               ) : referralData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -198,7 +198,7 @@ export default function RiskAssessment() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  No referral data available
+                  Geen verwijzingsgegevens beschikbaar
                 </div>
               )}
             </CardContent>
@@ -206,13 +206,13 @@ export default function RiskAssessment() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Time to Referral</CardTitle>
-              <CardDescription>Average days from first contact to referral</CardDescription>
+            <CardTitle>Tijd tot Verwijzing</CardTitle>
+            <CardDescription>Gemiddeld aantal dagen van eerste contact tot verwijzing</CardDescription>
             </CardHeader>
             <CardContent>
               {referralsLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Loading...</div>
+                  <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>
               ) : referralData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -227,12 +227,12 @@ export default function RiskAssessment() {
                         borderRadius: "8px",
                       }}
                     />
-                    <Bar dataKey="avgDays" fill="#3b82f6" name="Avg. Days" />
+                    <Bar dataKey="avgDays" fill="#3b82f6" name="Gem. Dagen" />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  No referral data available
+                  Geen verwijzingsgegevens beschikbaar
                 </div>
               )}
             </CardContent>

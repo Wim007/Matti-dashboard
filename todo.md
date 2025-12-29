@@ -39,3 +39,10 @@
 ## Bug Fixes
 - [x] Fix SQL DATE() function compatibility in time-series queries
 - [x] Fix DATE_FORMAT query to use proper date truncation for TiDB compatibility
+- [x] Fix CAST AS DATE query using DATE() function or alternative date truncation method
+
+## Localization
+- [x] Translate all dashboard pages to Dutch
+- [x] Translate navigation menu to Dutch
+- [x] Translate API Keys page to Dutch
+- [x] Translate error messages and notifications to Dutch

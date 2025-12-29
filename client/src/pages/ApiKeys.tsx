@@ -26,26 +26,26 @@ export default function ApiKeys() {
       setNewKeyName("");
       setNewKeyApp("matti");
       utils.apiKeys.list.invalidate();
-      toast.success("API key created successfully");
+      toast.success("API-sleutel succesvol aangemaakt");
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to create API key");
+      toast.error(error.message || "Aanmaken API-sleutel mislukt");
     },
   });
 
   const toggleMutation = trpc.apiKeys.toggle.useMutation({
     onSuccess: () => {
       utils.apiKeys.list.invalidate();
-      toast.success("API key status updated");
+      toast.success("API-sleutel status bijgewerkt");
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to update API key");
+      toast.error(error.message || "Bijwerken API-sleutel mislukt");
     },
   });
 
   const handleCreate = () => {
     if (!newKeyName.trim()) {
-      toast.error("Please enter a key name");
+      toast.error("Voer een sleutelnaam in");
       return;
     }
     createMutation.mutate({ name: newKeyName, appName: newKeyApp });
@@ -53,7 +53,7 @@ export default function ApiKeys() {
 
   const handleCopyKey = (key: string) => {
     navigator.clipboard.writeText(key);
-    toast.success("API key copied to clipboard");
+    toast.success("API-sleutel gekopieerd naar klembord");
   };
 
   const handleCloseCreateDialog = () => {
@@ -68,25 +68,25 @@ export default function ApiKeys() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">API Keys</h1>
+            <h1 className="text-3xl font-bold tracking-tight">API-sleutels</h1>
             <p className="text-muted-foreground mt-2">
-              Manage authentication keys for Matti and Opvoedmaatje apps
+              Beheer authenticatiesleutels voor Matti en Opvoedmaatje apps
             </p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Create API Key
+                API-sleutel Aanmaken
               </Button>
             </DialogTrigger>
             <DialogContent>
               {generatedKey ? (
                 <>
                   <DialogHeader>
-                    <DialogTitle>API Key Created</DialogTitle>
+                    <DialogTitle>API-sleutel Aangemaakt</DialogTitle>
                     <DialogDescription>
-                      Copy this key now. You won't be able to see it again.
+                      Kopieer deze sleutel nu. U kunt deze niet meer zien.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
@@ -102,29 +102,29 @@ export default function ApiKeys() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button onClick={handleCloseCreateDialog}>Done</Button>
+                    <Button onClick={handleCloseCreateDialog}>Klaar</Button>
                   </DialogFooter>
                 </>
               ) : (
                 <>
                   <DialogHeader>
-                    <DialogTitle>Create New API Key</DialogTitle>
+                    <DialogTitle>Nieuwe API-sleutel Aanmaken</DialogTitle>
                     <DialogDescription>
-                      Generate a new authentication key for app integration
+                      Genereer een nieuwe authenticatiesleutel voor app-integratie
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="keyName">Key Name</Label>
+                      <Label htmlFor="keyName">Sleutelnaam</Label>
                       <Input
                         id="keyName"
-                        placeholder="e.g., Production Matti Key"
+                        placeholder="bijv., Productie Matti Sleutel"
                         value={newKeyName}
                         onChange={(e) => setNewKeyName(e.target.value)}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="appName">App Name</Label>
+                      <Label htmlFor="appName">App Naam</Label>
                       <Select value={newKeyApp} onValueChange={(v) => setNewKeyApp(v as "matti" | "opvoedmaatje")}>
                         <SelectTrigger id="appName">
                           <SelectValue />
@@ -138,10 +138,10 @@ export default function ApiKeys() {
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={handleCloseCreateDialog}>
-                      Cancel
+                      Annuleren
                     </Button>
                     <Button onClick={handleCreate} disabled={createMutation.isPending}>
-                      {createMutation.isPending ? "Creating..." : "Create Key"}
+                      {createMutation.isPending ? "Aanmaken..." : "Sleutel Aanmaken"}
                     </Button>
                   </DialogFooter>
                 </>
@@ -152,9 +152,9 @@ export default function ApiKeys() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Active API Keys</CardTitle>
+            <CardTitle>Actieve API-sleutels</CardTitle>
             <CardDescription>
-              Manage authentication keys for external app integration
+              Beheer authenticatiesleutels voor externe app-integratie
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -182,11 +182,11 @@ export default function ApiKeys() {
                             {apiKey.appName}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            Created {new Date(apiKey.createdAt).toLocaleDateString()}
+                            Aangemaakt {new Date(apiKey.createdAt).toLocaleDateString("nl-NL")}
                           </span>
                           {apiKey.lastUsedAt && (
                             <span className="text-xs text-muted-foreground">
-                              Last used {new Date(apiKey.lastUsedAt).toLocaleDateString()}
+                              Laatst gebruikt {new Date(apiKey.lastUsedAt).toLocaleDateString("nl-NL")}
                             </span>
                           )}
                         </div>
@@ -195,7 +195,7 @@ export default function ApiKeys() {
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <Label htmlFor={`toggle-${apiKey.id}`} className="text-sm">
-                          {apiKey.isActive ? "Active" : "Inactive"}
+                          {apiKey.isActive ? "Actief" : "Inactief"}
                         </Label>
                         <Switch
                           id={`toggle-${apiKey.id}`}
@@ -212,9 +212,9 @@ export default function ApiKeys() {
             ) : (
               <div className="text-center py-12">
                 <Key className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No API keys created yet</p>
+                <p className="text-muted-foreground">Nog geen API-sleutels aangemaakt</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Create your first API key to start receiving analytics data
+                  Maak uw eerste API-sleutel aan om analytics-gegevens te ontvangen
                 </p>
               </div>
             )}

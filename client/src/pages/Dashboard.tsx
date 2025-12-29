@@ -17,30 +17,30 @@ export default function Dashboard() {
 
     return [
       {
-        title: "Total Events",
+        title: "Totaal Gebeurtenissen",
         value: summary.totalEvents?.toLocaleString() ?? "0",
-        description: "Analytics events recorded",
+        description: "Geregistreerde analytics gebeurtenissen",
         icon: Activity,
         trend: null,
       },
       {
-        title: "Unique Users",
+        title: "Unieke Gebruikers",
         value: summary.uniqueUsers?.toLocaleString() ?? "0",
-        description: "Based on postal code areas",
+        description: "Gebaseerd op postcodegebieden",
         icon: Users,
         trend: null,
       },
       {
-        title: "Returning Users",
+        title: "Terugkerende Gebruikers",
         value: `${summary.returningUserRate?.toFixed(1) ?? "0"}%`,
-        description: "User retention rate",
+        description: "Gebruikersbehoudpercentage",
         icon: TrendingUp,
         trend: null,
       },
       {
-        title: "High Risk Users",
+        title: "Hoog Risico Gebruikers",
         value: summary.highRiskCount?.toLocaleString() ?? "0",
-        description: "Users with 3+ themes",
+        description: "Gebruikers met 3+ thema's",
         icon: AlertTriangle,
         trend: null,
       },
@@ -53,7 +53,7 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
           <p className="text-muted-foreground mt-2">
-            Monitor anonymized usage data from Matti and Opvoedmaatje family support apps
+            Monitor geanonimiseerde gebruiksgegevens van Matti en Opvoedmaatje gezinsondersteuning apps
           </p>
         </div>
 
@@ -62,7 +62,7 @@ export default function Dashboard() {
             Array.from({ length: 4 }).map((_, i) => (
               <Card key={i}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Loading...</CardTitle>
+                  <CardTitle className="text-sm font-medium">Laden...</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-8 bg-muted animate-pulse rounded" />
@@ -91,8 +91,8 @@ export default function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Engagement Metrics</CardTitle>
-              <CardDescription>Average session and interaction data</CardDescription>
+              <CardTitle>Betrokkenheidsstatistieken</CardTitle>
+              <CardDescription>Gemiddelde sessie- en interactiegegevens</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoading ? (
@@ -104,19 +104,19 @@ export default function Dashboard() {
               ) : (
                 <>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Avg. Session Duration</span>
+                    <span className="text-sm text-muted-foreground">Gem. Sessieduur</span>
                     <span className="text-lg font-semibold">
                       {Math.round((summary?.avgSessionDuration ?? 0) / 60)} min
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Avg. Messages per Session</span>
+                    <span className="text-sm text-muted-foreground">Gem. Berichten per Sessie</span>
                     <span className="text-lg font-semibold">
                       {summary?.avgMessageCount?.toFixed(1) ?? "0"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Satisfaction Score</span>
+                    <span className="text-sm text-muted-foreground">Tevredenheidsscore</span>
                     <span className="text-lg font-semibold">
                       {summary?.avgSatisfactionScore?.toFixed(1) ?? "N/A"} / 10
                     </span>
@@ -128,8 +128,8 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Risk Assessment</CardTitle>
-              <CardDescription>Safety and intervention metrics</CardDescription>
+              <CardTitle>Risicobeoordeling</CardTitle>
+              <CardDescription>Veiligheids- en interventiemetingen</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoading ? (
@@ -141,19 +141,19 @@ export default function Dashboard() {
               ) : (
                 <>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Safety Signals</span>
+                    <span className="text-sm text-muted-foreground">Veiligheidssignalen</span>
                     <span className="text-lg font-semibold text-destructive">
                       {summary?.safetySignalCount?.toLocaleString() ?? "0"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">High Risk Users</span>
+                    <span className="text-sm text-muted-foreground">Hoog Risico Gebruikers</span>
                     <span className="text-lg font-semibold text-yellow-500">
                       {summary?.highRiskCount?.toLocaleString() ?? "0"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Self-Reported Improvement</span>
+                    <span className="text-sm text-muted-foreground">Zelfgerapporteerde Verbetering</span>
                     <span className="text-lg font-semibold text-green-500">
                       {summary?.improvementRate?.toFixed(1) ?? "0"}%
                     </span>

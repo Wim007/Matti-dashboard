@@ -18,7 +18,7 @@ export default function Engagement() {
   const sessionData = useMemo(() => {
     if (!sessionDuration) return [];
     return sessionDuration.map((item) => ({
-      date: new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: new Date(item.date).toLocaleDateString("nl-NL", { month: "short", day: "numeric" }),
       avgDuration: Number(item.avgDuration) / 60, // Convert to minutes
       count: Number(item.count),
     }));
@@ -27,7 +27,7 @@ export default function Engagement() {
   const messageData = useMemo(() => {
     if (!messageCount) return [];
     return messageCount.map((item) => ({
-      date: new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: new Date(item.date).toLocaleDateString("nl-NL", { month: "short", day: "numeric" }),
       avgMessages: Number(item.avgMessages),
       count: Number(item.count),
     }));
@@ -37,62 +37,62 @@ export default function Engagement() {
     <DashboardLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">User Engagement</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Gebruikersbetrokkenheid</h1>
           <p className="text-muted-foreground mt-2">
-            Session duration, message counts, and user interaction patterns
+            Sessieduur, aantal berichten en gebruikersinteractiepatronen
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Session Duration</CardTitle>
+              <CardTitle className="text-sm font-medium">Gem. Sessieduur</CardTitle>
               <Timer className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {Math.round((summary?.avgSessionDuration ?? 0) / 60)} min
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Average time per session</p>
+              <p className="text-xs text-muted-foreground mt-1">Gemiddelde tijd per sessie</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Messages</CardTitle>
+              <CardTitle className="text-sm font-medium">Gem. Berichten</CardTitle>
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {summary?.avgMessageCount?.toFixed(1) ?? "0"}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Messages per session</p>
+              <p className="text-xs text-muted-foreground mt-1">Berichten per sessie</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
+              <CardTitle className="text-sm font-medium">Totaal Sessies</CardTitle>
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {summary?.totalEvents?.toLocaleString() ?? "0"}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">In selected period</p>
+              <p className="text-xs text-muted-foreground mt-1">In geselecteerde periode</p>
             </CardContent>
           </Card>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Session Duration Trend</CardTitle>
-            <CardDescription>Average session duration over time (minutes)</CardDescription>
+            <CardTitle>Sessieduur Trend</CardTitle>
+            <CardDescription>Gemiddelde sessieduur over tijd (minuten)</CardDescription>
           </CardHeader>
           <CardContent>
             {sessionLoading ? (
               <div className="h-[400px] flex items-center justify-center">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
+                <div className="animate-pulse text-muted-foreground">Laden...</div>
               </div>
             ) : sessionData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
@@ -112,7 +112,7 @@ export default function Engagement() {
                       border: "1px solid rgba(255,255,255,0.2)",
                       borderRadius: "8px",
                     }}
-                    formatter={(value: number) => [`${value.toFixed(1)} min`, "Avg. Duration"]}
+                    formatter={(value: number) => [`${value.toFixed(1)} min`, "Gem. Duur"]}
                   />
                   <Legend />
                   <Area
@@ -121,13 +121,13 @@ export default function Engagement() {
                     stroke="#3b82f6"
                     fillOpacity={1}
                     fill="url(#colorDuration)"
-                    name="Avg. Duration (min)"
+                    name="Gem. Duur (min)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[400px] flex items-center justify-center text-muted-foreground">
-                No data available
+                Geen gegevens beschikbaar
               </div>
             )}
           </CardContent>
@@ -135,13 +135,13 @@ export default function Engagement() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Message Count Trend</CardTitle>
-            <CardDescription>Average messages per session over time</CardDescription>
+            <CardTitle>Aantal Berichten Trend</CardTitle>
+            <CardDescription>Gemiddeld aantal berichten per sessie over tijd</CardDescription>
           </CardHeader>
           <CardContent>
             {messageLoading ? (
               <div className="h-[400px] flex items-center justify-center">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
+                <div className="animate-pulse text-muted-foreground">Laden...</div>
               </div>
             ) : messageData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
@@ -155,7 +155,7 @@ export default function Engagement() {
                       border: "1px solid rgba(255,255,255,0.2)",
                       borderRadius: "8px",
                     }}
-                    formatter={(value: number) => [`${value.toFixed(1)}`, "Avg. Messages"]}
+                    formatter={(value: number) => [`${value.toFixed(1)}`, "Gem. Berichten"]}
                   />
                   <Legend />
                   <Line
@@ -164,13 +164,13 @@ export default function Engagement() {
                     stroke="#10b981"
                     strokeWidth={2}
                     dot={{ fill: "#10b981" }}
-                    name="Avg. Messages"
+                    name="Gem. Berichten"
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[400px] flex items-center justify-center text-muted-foreground">
-                No data available
+                Geen gegevens beschikbaar
               </div>
             )}
           </CardContent>
@@ -179,13 +179,13 @@ export default function Engagement() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Session Volume</CardTitle>
-              <CardDescription>Number of sessions per day</CardDescription>
+              <CardTitle>Sessie Volume</CardTitle>
+              <CardDescription>Aantal sessies per dag</CardDescription>
             </CardHeader>
             <CardContent>
               {sessionLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Loading...</div>
+                  <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>
               ) : sessionData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
@@ -212,13 +212,13 @@ export default function Engagement() {
                       stroke="#f59e0b"
                       fillOpacity={1}
                       fill="url(#colorCount)"
-                      name="Sessions"
+                      name="Sessies"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  No data available
+                  Geen gegevens beschikbaar
                 </div>
               )}
             </CardContent>
@@ -226,24 +226,24 @@ export default function Engagement() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Engagement Quality</CardTitle>
-              <CardDescription>Key engagement indicators</CardDescription>
+              <CardTitle>Betrokkenheidskwaliteit</CardTitle>
+              <CardDescription>Belangrijke betrokkenheidsindicatoren</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Returning User Rate</span>
+                <span className="text-sm text-muted-foreground">Terugkeerpercentage</span>
                 <span className="text-2xl font-semibold">
                   {summary?.returningUserRate?.toFixed(1) ?? "0"}%
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Satisfaction Score</span>
+                <span className="text-sm text-muted-foreground">Tevredenheidsscore</span>
                 <span className="text-2xl font-semibold">
                   {summary?.avgSatisfactionScore?.toFixed(1) ?? "N/A"} / 10
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Self-Reported Improvement</span>
+                <span className="text-sm text-muted-foreground">Zelfgerapporteerde Verbetering</span>
                 <span className="text-2xl font-semibold text-green-500">
                   {summary?.improvementRate?.toFixed(1) ?? "0"}%
                 </span>
