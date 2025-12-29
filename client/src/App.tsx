@@ -4,15 +4,21 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import ApiKeys from "./pages/ApiKeys";
+import Demographics from "./pages/Demographics";
+import Engagement from "./pages/Engagement";
+import RiskAssessment from "./pages/RiskAssessment";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={Dashboard} />
+      <Route path="/demographics" component={Demographics} />
+      <Route path="/engagement" component={Engagement} />
+      <Route path="/risk-assessment" component={RiskAssessment} />
+      <Route path="/api-keys" component={ApiKeys} />
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
@@ -26,10 +32,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
           <Router />

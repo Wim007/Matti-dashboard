@@ -1,11 +1,10 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { analyticsEvents, apiKeys, InsertAnalyticsEvent, InsertApiKey, InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -89,4 +88,127 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Analytics Events
+export async function insertAnalyticsEvent(event: InsertAnalyticsEvent) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(analyticsEvents).values(event);
+  return result;
+}
+
+export async function getAnalyticsEvents(filters?: {
+  appName?: "matti" | "opvoedmaatje";
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions = [];
+  if (filters?.appName) {
+    conditions.push(eq(analyticsEvents.appName, filters.appName));
+  }
+  if (filters?.startDate) {
+    conditions.push(gte(analyticsEvents.timestamp, filters.startDate));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(analyticsEvents.timestamp, filters.endDate));
+  }
+
+  const query = db
+    .select()
+    .from(analyticsEvents)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(analyticsEvents.timestamp));
+
+  if (filters?.limit) {
+    return await query.limit(filters.limit);
+  }
+
+  return await query;
+}
+
+export async function getAnalyticsSummary(filters?: {
+  appName?: "matti" | "opvoedmaatje";
+  startDate?: Date;
+  endDate?: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions = [];
+  if (filters?.appName) {
+    conditions.push(eq(analyticsEvents.appName, filters.appName));
+  }
+  if (filters?.startDate) {
+    conditions.push(gte(analyticsEvents.timestamp, filters.startDate));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(analyticsEvents.timestamp, filters.endDate));
+  }
+
+  const result = await db
+    .select({
+      totalEvents: sql<number>`count(*)`,
+      uniqueUsers: sql<number>`count(distinct ${analyticsEvents.postalCodeArea})`,
+      avgSessionDuration: sql<number>`avg(${analyticsEvents.sessionDuration})`,
+      avgMessageCount: sql<number>`avg(${analyticsEvents.messageCount})`,
+      returningUserRate: sql<number>`avg(case when ${analyticsEvents.isReturningUser} then 1 else 0 end) * 100`,
+      highRiskCount: sql<number>`sum(case when ${analyticsEvents.isHighRisk} then 1 else 0 end)`,
+      safetySignalCount: sql<number>`sum(case when ${analyticsEvents.safetySignal} then 1 else 0 end)`,
+      avgSatisfactionScore: sql<number>`avg(${analyticsEvents.satisfactionScore})`,
+      improvementRate: sql<number>`avg(case when ${analyticsEvents.selfReportedImprovement} then 1 else 0 end) * 100`,
+    })
+    .from(analyticsEvents)
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+  return result[0];
+}
+
+// API Keys
+export async function createApiKey(apiKey: InsertApiKey) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(apiKeys).values(apiKey);
+  return result;
+}
+
+export async function getApiKeyByKey(key: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(apiKeys)
+    .where(and(eq(apiKeys.key, key), eq(apiKeys.isActive, true)))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateApiKeyLastUsed(keyId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(apiKeys)
+    .set({ lastUsedAt: new Date() })
+    .where(eq(apiKeys.id, keyId));
+}
+
+export async function getAllApiKeys() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.select().from(apiKeys).orderBy(desc(apiKeys.createdAt));
+}
+
+export async function toggleApiKeyStatus(keyId: number, isActive: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(apiKeys).set({ isActive }).where(eq(apiKeys.id, keyId));
+}
