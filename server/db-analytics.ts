@@ -154,14 +154,14 @@ export async function getSessionDurationTimeSeries(filters: AnalyticsFilters) {
 
   const result = await db
     .select({
-      date: sql<string>`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`,
+      date: sql<string>`CAST(${analyticsEvents.timestamp} AS DATE)`,
       avgDuration: sql<number>`avg(${analyticsEvents.sessionDuration})`,
       count: sql<number>`count(*)`,
     })
     .from(analyticsEvents)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(sql`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`)
-    .orderBy(sql`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`);
+    .groupBy(sql`CAST(${analyticsEvents.timestamp} AS DATE)`)
+    .orderBy(sql`CAST(${analyticsEvents.timestamp} AS DATE)`);
 
   return result;
 }
@@ -174,14 +174,14 @@ export async function getMessageCountTimeSeries(filters: AnalyticsFilters) {
 
   const result = await db
     .select({
-      date: sql<string>`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`,
+      date: sql<string>`CAST(${analyticsEvents.timestamp} AS DATE)`,
       avgMessages: sql<number>`avg(${analyticsEvents.messageCount})`,
       count: sql<number>`count(*)`,
     })
     .from(analyticsEvents)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(sql`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`)
-    .orderBy(sql`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`);
+    .groupBy(sql`CAST(${analyticsEvents.timestamp} AS DATE)`)
+    .orderBy(sql`CAST(${analyticsEvents.timestamp} AS DATE)`);
 
   return result;
 }
@@ -194,15 +194,15 @@ export async function getRiskMetrics(filters: AnalyticsFilters) {
 
   const result = await db
     .select({
-      date: sql<string>`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`,
+      date: sql<string>`CAST(${analyticsEvents.timestamp} AS DATE)`,
       highRiskCount: sql<number>`sum(case when ${analyticsEvents.isHighRisk} then 1 else 0 end)`,
       safetySignalCount: sql<number>`sum(case when ${analyticsEvents.safetySignal} then 1 else 0 end)`,
       totalCount: sql<number>`count(*)`,
     })
     .from(analyticsEvents)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(sql`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`)
-    .orderBy(sql`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`);
+    .groupBy(sql`CAST(${analyticsEvents.timestamp} AS DATE)`)
+    .orderBy(sql`CAST(${analyticsEvents.timestamp} AS DATE)`);
 
   return result;
 }

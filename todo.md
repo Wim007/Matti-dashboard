@@ -38,3 +38,4 @@
 
 ## Bug Fixes
 - [x] Fix SQL DATE() function compatibility in time-series queries
+- [x] Fix DATE_FORMAT query to use proper date truncation for TiDB compatibility
