@@ -152,18 +152,34 @@ export async function getSessionDurationTimeSeries(filters: AnalyticsFilters) {
 
   const conditions = buildConditions(filters);
 
-  // Use FROM_UNIXTIME for TiDB compatibility
-  const dateColumn = sql<string>`FROM_UNIXTIME(UNIX_TIMESTAMP(${analyticsEvents.timestamp}), '%Y-%m-%d')`;
-  const result = await db
+  // Fetch all records and group in Node.js (TiDB doesn't support date functions in GROUP BY)
+  const records = await db
     .select({
-      date: dateColumn.as('date'),
-      avgDuration: sql<number>`AVG(${analyticsEvents.sessionDuration})`.as('avgDuration'),
-      count: sql<number>`COUNT(*)`.as('count'),
+      timestamp: analyticsEvents.timestamp,
+      sessionDuration: analyticsEvents.sessionDuration,
     })
     .from(analyticsEvents)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(dateColumn)
-    .orderBy(dateColumn);
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+  // Group by date in Node.js
+  const grouped = new Map<string, { totalDuration: number; count: number }>();
+  
+  for (const record of records) {
+    const date = new Date(record.timestamp).toISOString().split('T')[0];
+    const existing = grouped.get(date) || { totalDuration: 0, count: 0 };
+    existing.totalDuration += record.sessionDuration;
+    existing.count += 1;
+    grouped.set(date, existing);
+  }
+
+  // Convert to array and calculate averages
+  const result = Array.from(grouped.entries())
+    .map(([date, data]) => ({
+      date,
+      avgDuration: data.totalDuration / data.count,
+      count: data.count,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   return result;
 }
@@ -174,17 +190,34 @@ export async function getMessageCountTimeSeries(filters: AnalyticsFilters) {
 
   const conditions = buildConditions(filters);
 
-  const dateColumn = sql<string>`FROM_UNIXTIME(UNIX_TIMESTAMP(${analyticsEvents.timestamp}), '%Y-%m-%d')`;
-  const result = await db
+  // Fetch all records and group in Node.js (TiDB doesn't support date functions in GROUP BY)
+  const records = await db
     .select({
-      date: dateColumn.as('date'),
-      avgMessages: sql<number>`AVG(${analyticsEvents.messageCount})`.as('avgMessages'),
-      count: sql<number>`COUNT(*)`.as('count'),
+      timestamp: analyticsEvents.timestamp,
+      messageCount: analyticsEvents.messageCount,
     })
     .from(analyticsEvents)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(dateColumn)
-    .orderBy(dateColumn);
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+  // Group by date in Node.js
+  const grouped = new Map<string, { totalMessages: number; count: number }>();
+  
+  for (const record of records) {
+    const date = new Date(record.timestamp).toISOString().split('T')[0];
+    const existing = grouped.get(date) || { totalMessages: 0, count: 0 };
+    existing.totalMessages += record.messageCount;
+    existing.count += 1;
+    grouped.set(date, existing);
+  }
+
+  // Convert to array and calculate averages
+  const result = Array.from(grouped.entries())
+    .map(([date, data]) => ({
+      date,
+      avgMessages: data.totalMessages / data.count,
+      count: data.count,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   return result;
 }

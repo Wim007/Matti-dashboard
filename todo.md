@@ -73,3 +73,8 @@
 ## Bug Fixes - Alternative Date Grouping
 - [x] Implement client-side date grouping or use raw timestamp with post-processing
 - [x] Test engagement queries with new approach
+
+## Bug Fixes - Server-Side Grouping
+- [x] Rewrite getSessionDurationTimeSeries to group data in Node.js
+- [x] Rewrite getMessageCountTimeSeries to group data in Node.js
+- [x] Test engagement page with server-side grouping
