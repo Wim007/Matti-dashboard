@@ -152,8 +152,8 @@ export async function getSessionDurationTimeSeries(filters: AnalyticsFilters) {
 
   const conditions = buildConditions(filters);
 
-  // Use raw SQL for date extraction to ensure compatibility
-  const dateColumn = sql<string>`DATE(${analyticsEvents.timestamp})`;
+  // Use DATE_FORMAT for MySQL/TiDB compatibility
+  const dateColumn = sql<string>`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`;
   const result = await db
     .select({
       date: dateColumn.as('date'),
@@ -174,7 +174,7 @@ export async function getMessageCountTimeSeries(filters: AnalyticsFilters) {
 
   const conditions = buildConditions(filters);
 
-  const dateColumn = sql<string>`DATE(${analyticsEvents.timestamp})`;
+  const dateColumn = sql<string>`DATE_FORMAT(${analyticsEvents.timestamp}, '%Y-%m-%d')`;
   const result = await db
     .select({
       date: dateColumn.as('date'),

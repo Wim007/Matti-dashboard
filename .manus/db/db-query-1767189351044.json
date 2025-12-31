@@ -1,0 +1,13 @@
+{
+  "query": "SELECT DATE(timestamp) as date_only FROM analytics_events LIMIT 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3bjG5q3gEHRTz8G.ffef126f5708 --database GkTrmFEWBPVzagDkSSuYWq --execute SELECT DATE(timestamp) as date_only FROM analytics_events LIMIT 1",
+  "rows": [
+    {
+      "date_only": "2025-12-02"
+    }
+  ],
+  "messages": [],
+  "stdout": "date_only\n2025-12-02\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

@@ -65,3 +65,7 @@
 - [x] Fix DATE() function in sessionDuration query
 - [x] Fix DATE() function in messageCount query
 - [x] Test engagement page visualizations
+
+## Bug Fixes - TiDB Compatibility
+- [x] Replace DATE() with DATE_FORMAT or date truncation in engagement queries
+- [x] Test engagement page with new date extraction method
