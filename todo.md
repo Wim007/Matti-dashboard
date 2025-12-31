@@ -21,7 +21,7 @@
 - [x] Build risk assessment metrics panel (high-risk users, safety signals)
 - [x] Add time-series charts (session duration, message counts, weekly frequency)
 - [x] Implement user engagement metrics (returning users, satisfaction, improvement)
-- [ ] Add date range filters for all visualizations
+- [x] Add date range filters for all visualizations
 
 ## Client Library
 - [x] Create TypeScript analytics-sender.ts with type-safe interfaces
