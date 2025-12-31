@@ -60,3 +60,8 @@
 - [x] Fix TypeError on Demographics page (if any)
 - [x] Fix TypeError on RiskAssessment page (if any)
 - [x] Test all pages to ensure no remaining toFixed errors
+
+## Bug Fixes - Engagement Page SQL Queries
+- [x] Fix DATE() function in sessionDuration query
+- [x] Fix DATE() function in messageCount query
+- [x] Test engagement page visualizations

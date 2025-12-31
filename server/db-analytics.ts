@@ -153,16 +153,17 @@ export async function getSessionDurationTimeSeries(filters: AnalyticsFilters) {
   const conditions = buildConditions(filters);
 
   // Use raw SQL for date extraction to ensure compatibility
+  const dateColumn = sql<string>`DATE(${analyticsEvents.timestamp})`;
   const result = await db
     .select({
-      date: sql<string>`DATE(${analyticsEvents.timestamp})`.as('date'),
+      date: dateColumn.as('date'),
       avgDuration: sql<number>`AVG(${analyticsEvents.sessionDuration})`.as('avgDuration'),
       count: sql<number>`COUNT(*)`.as('count'),
     })
     .from(analyticsEvents)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(sql`DATE(${analyticsEvents.timestamp})`)
-    .orderBy(sql`DATE(${analyticsEvents.timestamp})`);
+    .groupBy(dateColumn)
+    .orderBy(dateColumn);
 
   return result;
 }
@@ -173,16 +174,17 @@ export async function getMessageCountTimeSeries(filters: AnalyticsFilters) {
 
   const conditions = buildConditions(filters);
 
+  const dateColumn = sql<string>`DATE(${analyticsEvents.timestamp})`;
   const result = await db
     .select({
-      date: sql<string>`DATE(${analyticsEvents.timestamp})`.as('date'),
+      date: dateColumn.as('date'),
       avgMessages: sql<number>`AVG(${analyticsEvents.messageCount})`.as('avgMessages'),
       count: sql<number>`COUNT(*)`.as('count'),
     })
     .from(analyticsEvents)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(sql`DATE(${analyticsEvents.timestamp})`)
-    .orderBy(sql`DATE(${analyticsEvents.timestamp})`);
+    .groupBy(dateColumn)
+    .orderBy(dateColumn);
 
   return result;
 }
