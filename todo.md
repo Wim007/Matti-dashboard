@@ -88,3 +88,9 @@
 - [x] Integrate filter into Engagement page
 - [x] Integrate filter into Risk Assessment page
 - [x] Test date filtering across all visualizations
+
+## Refresh Data Feature
+- [x] Add "Ververs Data" button to Engagement page
+- [x] Implement tRPC query invalidation on button click
+- [x] Add loading state indicator during refresh
+- [x] Test refresh functionality

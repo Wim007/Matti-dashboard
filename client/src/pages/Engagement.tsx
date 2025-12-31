@@ -2,7 +2,8 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
 import { trpc } from "@/lib/trpc";
-import { Activity, MessageSquare, Timer } from "lucide-react";
+import { Activity, MessageSquare, RefreshCw, Timer } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -19,9 +20,25 @@ export default function Engagement() {
     endDate: dateRange.to.toISOString(),
   }), [dateRange]);
 
+  const utils = trpc.useUtils();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const { data: sessionDuration, isLoading: sessionLoading } = trpc.engagement.sessionDuration.useQuery(queryDateRange);
   const { data: messageCount, isLoading: messageLoading } = trpc.engagement.messageCount.useQuery(queryDateRange);
   const { data: summary } = trpc.analytics.getSummary.useQuery(queryDateRange);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        utils.engagement.sessionDuration.invalidate(),
+        utils.engagement.messageCount.invalidate(),
+        utils.analytics.getSummary.invalidate(),
+      ]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const sessionData = useMemo(() => {
     if (!sessionDuration) return [];
@@ -51,7 +68,19 @@ export default function Engagement() {
               Sessieduur, aantal berichten en gebruikersinteractiepatronen
             </p>
           </div>
-          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Ververs Data
+            </Button>
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
