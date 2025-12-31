@@ -64,7 +64,7 @@ export default function Engagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {summary?.avgMessageCount?.toFixed(1) ?? "0"}
+                {typeof summary?.avgMessageCount === 'number' ? summary.avgMessageCount.toFixed(1) : "0"}
               </div>
               <p className="text-xs text-muted-foreground mt-1">Berichten per sessie</p>
             </CardContent>
@@ -233,19 +233,19 @@ export default function Engagement() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Terugkeerpercentage</span>
                 <span className="text-2xl font-semibold">
-                  {summary?.returningUserRate?.toFixed(1) ?? "0"}%
+                  {typeof summary?.returningUserRate === 'number' ? summary.returningUserRate.toFixed(1) : "0"}%
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Tevredenheidsscore</span>
                 <span className="text-2xl font-semibold">
-                  {summary?.avgSatisfactionScore?.toFixed(1) ?? "N/A"} / 10
+                  {typeof summary?.avgSatisfactionScore === 'number' ? summary.avgSatisfactionScore.toFixed(1) : "N/A"} / 10
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Zelfgerapporteerde Verbetering</span>
                 <span className="text-2xl font-semibold text-green-500">
-                  {summary?.improvementRate?.toFixed(1) ?? "0"}%
+                  {typeof summary?.improvementRate === 'number' ? summary.improvementRate.toFixed(1) : "0"}%
                 </span>
               </div>
             </CardContent>

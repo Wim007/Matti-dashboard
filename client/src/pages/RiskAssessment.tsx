@@ -98,7 +98,7 @@ export default function RiskAssessment() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-500">
-                {summary?.improvementRate?.toFixed(1) ?? "0"}%
+                {typeof summary?.improvementRate === 'number' ? summary.improvementRate.toFixed(1) : "0"}%
               </div>
               <p className="text-xs text-muted-foreground mt-1">Zelfgerapporteerde verbetering</p>
             </CardContent>
