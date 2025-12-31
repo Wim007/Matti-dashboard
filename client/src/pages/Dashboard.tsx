@@ -32,7 +32,7 @@ export default function Dashboard() {
       },
       {
         title: "Terugkerende Gebruikers",
-        value: `${summary.returningUserRate?.toFixed(1) ?? "0"}%`,
+        value: `${typeof summary.returningUserRate === 'number' ? summary.returningUserRate.toFixed(1) : "0"}%`,
         description: "Gebruikersbehoudpercentage",
         icon: TrendingUp,
         trend: null,
@@ -112,13 +112,13 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Gem. Berichten per Sessie</span>
                     <span className="text-lg font-semibold">
-                      {summary?.avgMessageCount?.toFixed(1) ?? "0"}
+                      {typeof summary?.avgMessageCount === 'number' ? summary.avgMessageCount.toFixed(1) : "0"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Tevredenheidsscore</span>
                     <span className="text-lg font-semibold">
-                      {summary?.avgSatisfactionScore?.toFixed(1) ?? "N/A"} / 10
+                      {typeof summary?.avgSatisfactionScore === 'number' ? summary.avgSatisfactionScore.toFixed(1) : "N/A"} / 10
                     </span>
                   </div>
                 </>
@@ -155,7 +155,7 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Zelfgerapporteerde Verbetering</span>
                     <span className="text-lg font-semibold text-green-500">
-                      {summary?.improvementRate?.toFixed(1) ?? "0"}%
+                      {typeof summary?.improvementRate === 'number' ? summary.improvementRate.toFixed(1) : "0"}%
                     </span>
                   </div>
                 </>
