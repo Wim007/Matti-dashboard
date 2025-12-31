@@ -1,19 +1,27 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
 import { trpc } from "@/lib/trpc";
 import { Activity, MessageSquare, Timer } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export default function Engagement() {
-  const [dateRange] = useState(() => ({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date().toISOString(),
-  }));
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - 30);
+    return { from, to };
+  });
 
-  const { data: sessionDuration, isLoading: sessionLoading } = trpc.engagement.sessionDuration.useQuery(dateRange);
-  const { data: messageCount, isLoading: messageLoading } = trpc.engagement.messageCount.useQuery(dateRange);
-  const { data: summary } = trpc.analytics.getSummary.useQuery(dateRange);
+  const queryDateRange = useMemo(() => ({
+    startDate: dateRange.from.toISOString(),
+    endDate: dateRange.to.toISOString(),
+  }), [dateRange]);
+
+  const { data: sessionDuration, isLoading: sessionLoading } = trpc.engagement.sessionDuration.useQuery(queryDateRange);
+  const { data: messageCount, isLoading: messageLoading } = trpc.engagement.messageCount.useQuery(queryDateRange);
+  const { data: summary } = trpc.analytics.getSummary.useQuery(queryDateRange);
 
   const sessionData = useMemo(() => {
     if (!sessionDuration) return [];
@@ -36,11 +44,14 @@ export default function Engagement() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gebruikersbetrokkenheid</h1>
-          <p className="text-muted-foreground mt-2">
-            Sessieduur, aantal berichten en gebruikersinteractiepatronen
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Gebruikersbetrokkenheid</h1>
+            <p className="text-muted-foreground mt-2">
+              Sessieduur, aantal berichten en gebruikersinteractiepatronen
+            </p>
+          </div>
+          <DateRangeFilter value={dateRange} onChange={setDateRange} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

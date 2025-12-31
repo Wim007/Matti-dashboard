@@ -1,5 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
 import { trpc } from "@/lib/trpc";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -7,16 +8,23 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveCo
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#84cc16"];
 
 export default function Demographics() {
-  const [dateRange] = useState(() => ({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date().toISOString(),
-  }));
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - 30);
+    return { from, to };
+  });
 
-  const { data: ageGroups, isLoading: ageLoading } = trpc.demographics.ageGroups.useQuery(dateRange);
-  const { data: postalCodes, isLoading: postalLoading } = trpc.demographics.postalCodes.useQuery(dateRange);
-  const { data: userTypes, isLoading: userTypesLoading } = trpc.demographics.userTypes.useQuery(dateRange);
-  const { data: familyTypes, isLoading: familyTypesLoading } = trpc.demographics.familyTypes.useQuery(dateRange);
-  const { data: themes, isLoading: themesLoading } = trpc.demographics.themes.useQuery(dateRange);
+  const queryDateRange = useMemo(() => ({
+    startDate: dateRange.from.toISOString(),
+    endDate: dateRange.to.toISOString(),
+  }), [dateRange]);
+
+  const { data: ageGroups, isLoading: ageLoading } = trpc.demographics.ageGroups.useQuery(queryDateRange);
+  const { data: postalCodes, isLoading: postalLoading } = trpc.demographics.postalCodes.useQuery(queryDateRange);
+  const { data: userTypes, isLoading: userTypesLoading } = trpc.demographics.userTypes.useQuery(queryDateRange);
+  const { data: familyTypes, isLoading: familyTypesLoading } = trpc.demographics.familyTypes.useQuery(queryDateRange);
+  const { data: themes, isLoading: themesLoading } = trpc.demographics.themes.useQuery(queryDateRange);
 
   const ageGroupData = useMemo(() => {
     if (!ageGroups) return [];
@@ -66,11 +74,14 @@ export default function Demographics() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Demografie</h1>
-          <p className="text-muted-foreground mt-2">
-            Gebruikersdemografie en verdelingsanalyse
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Demografie</h1>
+            <p className="text-muted-foreground mt-2">
+              Gebruikersdemografie en verdelingsanalyse
+            </p>
+          </div>
+          <DateRangeFilter value={dateRange} onChange={setDateRange} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

@@ -1,16 +1,24 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
 import { trpc } from "@/lib/trpc";
 import { Activity, AlertTriangle, TrendingUp, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export default function Dashboard() {
-  const [dateRange] = useState(() => ({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date().toISOString(),
-  }));
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - 30);
+    return { from, to };
+  });
 
-  const { data: summary, isLoading } = trpc.analytics.getSummary.useQuery(dateRange);
+  const queryDateRange = useMemo(() => ({
+    startDate: dateRange.from.toISOString(),
+    endDate: dateRange.to.toISOString(),
+  }), [dateRange]);
+
+  const { data: summary, isLoading } = trpc.analytics.getSummary.useQuery(queryDateRange);
 
   const stats = useMemo(() => {
     if (!summary) return [];
@@ -50,12 +58,16 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
-          <p className="text-muted-foreground mt-2">
-            Monitor geanonimiseerde gebruiksgegevens van Matti en Opvoedmaatje gezinsondersteuning apps
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h2>
+            <p className="text-muted-foreground">
+              Monitor geanonimiseerde gebruiksgegevens van Matti en Opvoedmaatje gezinsondersteuning apps
+            </p>
+          </div>
+          <DateRangeFilter value={dateRange} onChange={setDateRange} />
         </div>
+
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {isLoading ? (

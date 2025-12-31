@@ -78,3 +78,13 @@
 - [x] Rewrite getSessionDurationTimeSeries to group data in Node.js
 - [x] Rewrite getMessageCountTimeSeries to group data in Node.js
 - [x] Test engagement page with server-side grouping
+
+## Date Range Filter Feature
+- [x] Create DateRangeFilter component with preset options (7/30/90 dagen, aangepast)
+- [x] Integrate react-day-picker for custom date selection
+- [x] Add date range state management and URL persistence
+- [x] Integrate filter into Dashboard page
+- [x] Integrate filter into Demographics page
+- [x] Integrate filter into Engagement page
+- [x] Integrate filter into Risk Assessment page
+- [x] Test date filtering across all visualizations
