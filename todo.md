@@ -69,3 +69,7 @@
 ## Bug Fixes - TiDB Compatibility
 - [x] Replace DATE() with DATE_FORMAT or date truncation in engagement queries
 - [x] Test engagement page with new date extraction method
+
+## Bug Fixes - Alternative Date Grouping
+- [x] Implement client-side date grouping or use raw timestamp with post-processing
+- [x] Test engagement queries with new approach
