@@ -238,7 +238,7 @@ export default function Demographics() {
           <CardContent>
             {themesLoading ? (
               <div className="h-[400px] flex items-center justify-center">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
+                <div className="animate-pulse text-muted-foreground">Laden...</div>
               </div>
             ) : themeData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
@@ -259,7 +259,7 @@ export default function Demographics() {
               </ResponsiveContainer>
             ) : (
               <div className="h-[400px] flex items-center justify-center text-muted-foreground">
-                No data available
+                Geen gegevens beschikbaar
               </div>
             )}
           </CardContent>

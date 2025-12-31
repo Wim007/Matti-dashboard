@@ -66,7 +66,7 @@ function generateThemes() {
   while (selected.size < count) {
     selected.add(randomChoice(THEMES));
   }
-  return Array.from(selected).join(',');
+  return Array.from(selected);
 }
 
 // Helper to generate timestamp in the last 30 days
@@ -82,7 +82,7 @@ function generateEvent() {
   const appName = randomChoice(APPS);
   const userType = randomChoice(USER_TYPES);
   const themes = generateThemes();
-  const themeCount = themes.split(',').length;
+  const themeCount = themes.length;
   const isHighRisk = themeCount >= 3;
   const hasReferral = randomBool(0.15); // 15% chance of referral
   const isReturningUser = randomBool(0.4); // 40% returning users

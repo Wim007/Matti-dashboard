@@ -94,3 +94,10 @@
 - [x] Implement tRPC query invalidation on button click
 - [x] Add loading state indicator during refresh
 - [x] Test refresh functionality
+
+## Theme Frequency Analysis
+- [x] Create database query to extract and count themes from analytics events
+- [x] Add API endpoint for theme frequency data
+- [x] Create bar chart visualization for theme frequency
+- [x] Add theme frequency section to Demographics page
+- [x] Test theme analysis with sample data

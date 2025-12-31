@@ -114,9 +114,13 @@ export async function getThemeFrequency(filters: AnalyticsFilters) {
   // Count theme occurrences
   const themeCount = new Map<string, number>();
   events.forEach((event) => {
+    if (!event.themes) return;
+    // Themes are stored as JSON array
     const themes = event.themes as string[];
     themes.forEach((theme) => {
-      themeCount.set(theme, (themeCount.get(theme) || 0) + 1);
+      if (theme) {
+        themeCount.set(theme, (themeCount.get(theme) || 0) + 1);
+      }
     });
   });
 
