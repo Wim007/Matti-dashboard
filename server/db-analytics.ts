@@ -232,17 +232,37 @@ export async function getRiskMetrics(filters: AnalyticsFilters) {
 
   const conditions = buildConditions(filters);
 
-  const result = await db
+  // Fetch all records and group in Node.js (TiDB doesn't support date functions in GROUP BY)
+  const records = await db
     .select({
-      date: sql<string>`DATE(${analyticsEvents.timestamp})`.as('date'),
-      highRiskCount: sql<number>`SUM(CASE WHEN ${analyticsEvents.isHighRisk} THEN 1 ELSE 0 END)`.as('highRiskCount'),
-      safetySignalCount: sql<number>`SUM(CASE WHEN ${analyticsEvents.safetySignal} THEN 1 ELSE 0 END)`.as('safetySignalCount'),
-      totalCount: sql<number>`COUNT(*)`.as('totalCount'),
+      timestamp: analyticsEvents.timestamp,
+      isHighRisk: analyticsEvents.isHighRisk,
+      safetySignal: analyticsEvents.safetySignal,
     })
     .from(analyticsEvents)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .groupBy(sql`DATE(${analyticsEvents.timestamp})`)
-    .orderBy(sql`DATE(${analyticsEvents.timestamp})`);
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+  // Group by date in Node.js
+  const grouped = new Map<string, { highRiskCount: number; safetySignalCount: number; totalCount: number }>();
+  
+  for (const record of records) {
+    const date = new Date(record.timestamp).toISOString().split('T')[0];
+    const existing = grouped.get(date) || { highRiskCount: 0, safetySignalCount: 0, totalCount: 0 };
+    existing.highRiskCount += record.isHighRisk ? 1 : 0;
+    existing.safetySignalCount += record.safetySignal ? 1 : 0;
+    existing.totalCount += 1;
+    grouped.set(date, existing);
+  }
+
+  // Convert to array and sort by date
+  const result = Array.from(grouped.entries())
+    .map(([date, data]) => ({
+      date,
+      highRiskCount: data.highRiskCount,
+      safetySignalCount: data.safetySignalCount,
+      totalCount: data.totalCount,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   return result;
 }

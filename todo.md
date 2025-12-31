@@ -101,3 +101,8 @@
 - [x] Create bar chart visualization for theme frequency
 - [x] Add theme frequency section to Demographics page
 - [x] Test theme analysis with sample data
+
+## Risk Trend Analysis Fix
+- [x] Investigate what's missing in Risico Trend Analyse visualization
+- [x] Implement missing Risk Trend Analysis chart/visualization
+- [x] Test Risk Assessment page to ensure all visualizations work
