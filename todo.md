@@ -143,3 +143,10 @@
 - [ ] Add ROI calculation visualization
 - [ ] Implement PDF export functionality for presentations
 - [ ] Make cost parameters configurable for different municipalities
+
+## Emoji-Based Scoring for Youth Engagement
+- [x] Update integration guide with emoji-based scoring system
+- [x] Create emoji-to-score mapping configuration
+- [x] Add code examples for emoji selection UI in Matti
+- [x] Update AnalyticsService.ts to support emoji conversion
+- [x] Document backend emoji-to-score conversion logic

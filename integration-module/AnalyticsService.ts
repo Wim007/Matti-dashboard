@@ -40,6 +40,14 @@ export interface ConversationMetrics {
   userFeltBetter?: boolean;
 }
 
+export interface ThemeScoreData {
+  theme: string;
+  emoji?: string; // Optional: emoji selected by user
+  score?: number; // Numeric score (1-10)
+  isFollowUp?: boolean;
+  previousScore?: number; // For follow-up measurements
+}
+
 export interface UserData {
   postalCode?: string;
   birthYear?: number;
@@ -91,6 +99,19 @@ export const AVAILABLE_THEMES = [
   'zwangerschap',
   'huiselijk-geweld'
 ] as const;
+
+// ============================================================================
+// EMOJI MAPPING (matches emoji-config.ts)
+// ============================================================================
+
+const EMOJI_TO_SCORE: Record<string, number> = {
+  '😄': 2, '🙂': 4, '😐': 6, '😟': 8, '😢': 10,
+  '👍👍': 2, '👍': 4, '👌': 6, '👎': 8, '👎👎': 10,
+};
+
+const CHANGE_EMOJI_TO_DELTA: Record<string, number> = {
+  '👍👍': -4, '👍': -2, '👌': 0, '👎': +2, '👎👎': +4,
+};
 
 // ============================================================================
 // ANALYTICS SERVICE CLASS
@@ -424,6 +445,97 @@ Antwoord alleen met "ja" of "nee".`
       return '0000';
     }
     return postalCode.substring(0, 4);
+  }
+
+  /**
+   * Convert emoji to numeric score for analytics
+   * Supports emotion emoji's (😄🙂😐😟😢) and thumbs (👍👍👍👌👎👎👎)
+   */
+  private emojiToScore(emoji: string): number {
+    return EMOJI_TO_SCORE[emoji] || 5; // Default to middle score
+  }
+
+  /**
+   * Apply change emoji to existing score
+   */
+  private applyChangeEmoji(currentScore: number, changeEmoji: string): number {
+    const delta = CHANGE_EMOJI_TO_DELTA[changeEmoji] || 0;
+    return Math.max(1, Math.min(10, currentScore + delta));
+  }
+
+  /**
+   * Track theme score (emoji-based or numeric)
+   * Automatically converts emoji to numeric score for analytics
+   * 
+   * Usage examples:
+   * - Initial: trackThemeScore({ theme: 'pesten', emoji: '😟' })
+   * - Follow-up: trackThemeScore({ theme: 'pesten', emoji: '👍', isFollowUp: true, previousScore: 8 })
+   * - Direct score: trackThemeScore({ theme: 'pesten', score: 8 })
+   */
+  async trackThemeScore(data: ThemeScoreData & { userId: string }): Promise<void> {
+    if (!this.config.enabled) {
+      console.log('[Analytics] Disabled, skipping theme score tracking');
+      return;
+    }
+
+    try {
+      let finalScore: number;
+
+      if (data.emoji) {
+        if (data.isFollowUp && data.previousScore !== undefined) {
+          // Change emoji: apply delta to previous score
+          finalScore = this.applyChangeEmoji(data.previousScore, data.emoji);
+        } else {
+          // Initial emoji: convert directly
+          finalScore = this.emojiToScore(data.emoji);
+        }
+      } else if (data.score !== undefined) {
+        finalScore = data.score;
+      } else {
+        console.warn('[Analytics] No emoji or score provided');
+        return;
+      }
+
+      console.log(`[Analytics] Theme score: ${data.theme} = ${finalScore} (emoji: ${data.emoji || 'none'})`);
+
+      // Store locally to be sent with next conversation event
+      await this.storeThemeScore({
+        userId: data.userId,
+        theme: data.theme,
+        score: finalScore,
+        emoji: data.emoji,
+      });
+    } catch (error) {
+      console.error('[Analytics] Failed to track theme score:', error);
+      // Fail silently - analytics should never break the app
+    }
+  }
+
+  /**
+   * Store theme score locally (to be sent with next analytics event)
+   */
+  private async storeThemeScore(data: {
+    userId: string;
+    theme: string;
+    score: number;
+    emoji?: string;
+  }): Promise<void> {
+    try {
+      const key = `@analytics_theme_scores_${data.userId}`;
+      const existing = await AsyncStorage.getItem(key);
+      const scores = existing ? JSON.parse(existing) : [];
+
+      scores.push({
+        theme: data.theme,
+        score: data.score,
+        emoji: data.emoji,
+        timestamp: new Date().toISOString(),
+      });
+
+      await AsyncStorage.setItem(key, JSON.stringify(scores));
+    } catch (error) {
+      console.error('[Analytics] Failed to store theme score:', error);
+    }
   }
 
   private calculateAgeGroup(birthYear?: number): AgeGroup {
