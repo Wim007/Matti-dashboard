@@ -30,6 +30,7 @@ export default function RiskAssessment() {
   const { data: riskMetrics, isLoading: riskLoading } = trpc.engagement.riskMetrics.useQuery(queryDateRange);
   const { data: referrals, isLoading: referralsLoading } = trpc.engagement.referrals.useQuery(queryDateRange);
   const { data: summary } = trpc.analytics.getSummary.useQuery(queryDateRange);
+  const { data: improvementStats, isLoading: improvementLoading } = trpc.funding.getImprovementStats.useQuery(queryDateRange);
 
   const riskTimeSeriesData = useMemo(() => {
     if (!riskMetrics) return [];
@@ -249,6 +250,84 @@ export default function RiskAssessment() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Verbetering na Matti-gesprekken per Thema</CardTitle>
+            <CardDescription>
+              Gemiddelde verbetering per thema gebaseerd op voor/na metingen
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {improvementLoading ? (
+              <div className="h-[400px] flex items-center justify-center">
+                <div className="animate-pulse text-muted-foreground">Laden...</div>
+              </div>
+            ) : improvementStats && improvementStats.byTheme.length > 0 ? (
+              <div className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-3 mb-6">
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <div className="text-3xl font-bold text-green-500">
+                      {improvementStats.averageImprovement.toFixed(0)}%
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Gemiddelde verbetering</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <div className="text-3xl font-bold">
+                      {improvementStats.totalMeasurements}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Totaal metingen</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <div className="text-3xl font-bold">
+                      {improvementStats.averageConversations.toFixed(1)}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Gem. gesprekken</p>
+                  </div>
+                </div>
+
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart
+                    data={improvementStats.byTheme}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 120, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis type="number" stroke="rgba(255,255,255,0.5)" unit="%" />
+                    <YAxis type="category" dataKey="theme" stroke="rgba(255,255,255,0.5)" width={110} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "rgba(0,0,0,0.8)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        borderRadius: "8px",
+                      }}
+                      formatter={(value: number, name: string, props: any) => [
+                        `${value.toFixed(1)}% (${props.payload.count} metingen)`,
+                        "Verbetering"
+                      ]}
+                    />
+                    <Bar dataKey="improvement" name="Verbetering %">
+                      {improvementStats.byTheme.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.improvement >= 50 ? "#10b981" : entry.improvement >= 30 ? "#f59e0b" : "#ef4444"}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+
+                <div className="text-xs text-muted-foreground mt-4">
+                  * Verbetering berekend uit voor/na scores. Groen = ≥50%, Oranje = 30-49%, Rood = &lt;30%
+                </div>
+              </div>
+            ) : (
+              <div className="h-[400px] flex items-center justify-center text-muted-foreground">
+                Nog geen verbetering data beschikbaar. Data wordt verzameld zodra gebruikers thema-scores rapporteren.
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

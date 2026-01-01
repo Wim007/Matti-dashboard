@@ -9,6 +9,7 @@ import ApiKeys from "./pages/ApiKeys";
 import Demographics from "./pages/Demographics";
 import Engagement from "./pages/Engagement";
 import RiskAssessment from "./pages/RiskAssessment";
+import ImpactReport from "./pages/ImpactReport";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/demographics" component={Demographics} />
       <Route path="/engagement" component={Engagement} />
       <Route path="/risk-assessment" component={RiskAssessment} />
+      <Route path="/impact-report" component={ImpactReport} />
       <Route path="/api-keys" component={ApiKeys} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

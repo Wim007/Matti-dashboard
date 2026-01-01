@@ -150,3 +150,13 @@
 - [x] Add code examples for emoji selection UI in Matti
 - [x] Update AnalyticsService.ts to support emoji conversion
 - [x] Document backend emoji-to-score conversion logic
+
+## Phase 2 Funding Features (ESSENTIEEL)
+- [x] Add "Verbetering per Thema" section to Risk Assessment page with horizontal bar chart
+- [x] Show per-theme improvement percentages (pesten, stress, school, etc.)
+- [x] Include measurement count per theme
+- [x] Create new "Impact Report" page in navigation
+- [x] Add executive summary section with key metrics
+- [x] Implement ROI calculation visualization (costs vs savings)
+- [x] Add PDF export functionality for presentations
+- [x] Test Impact Report page and PDF export

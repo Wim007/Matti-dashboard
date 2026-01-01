@@ -7,6 +7,7 @@ import { apiKeysRouter } from "./routers/apiKeys";
 import { demographicsRouter } from "./routers/demographics";
 import { engagementRouter } from "./routers/engagement";
 import { fundingRouter } from "./routers/funding";
+import { pdfRouter } from "./routers/pdf";
 
 export const appRouter = router({
   system: systemRouter,
@@ -21,10 +22,11 @@ export const appRouter = router({
     }),
   }),
   analytics: analyticsRouter,
-  apiKeys: apiKeysRouter,
   demographics: demographicsRouter,
   engagement: engagementRouter,
   funding: fundingRouter,
+  pdf: pdfRouter,
+  apiKeys: apiKeysRouter,
 });
 
 export type AppRouter = typeof appRouter;
