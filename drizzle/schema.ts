@@ -62,3 +62,58 @@ export const apiKeys = mysqlTable("api_keys", {
 
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type InsertApiKey = typeof apiKeys.$inferInsert;
+
+/**
+ * Improvement scores table for tracking theme-based progress over time.
+ * Used for "Verbetering na Matti-gesprekken" feature.
+ */
+export const improvementScores = mysqlTable("improvement_scores", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 255 }).notNull(), // Anonymized user ID
+  theme: varchar("theme", { length: 100 }).notNull(), // pesten, stress, school, etc.
+  scoreStart: int("scoreStart").notNull(), // 1-10 initial score
+  scoreCurrent: int("scoreCurrent"), // 1-10 current score (null until follow-up)
+  measuredAt: timestamp("measuredAt").notNull(),
+  followUpAt: timestamp("followUpAt"), // When follow-up score was recorded
+  appName: mysqlEnum("appName", ["matti", "opvoedmaatje"]).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ImprovementScore = typeof improvementScores.$inferSelect;
+export type InsertImprovementScore = typeof improvementScores.$inferInsert;
+
+/**
+ * Referral tracking table for cost avoidance calculations.
+ */
+export const referralTracking = mysqlTable("referral_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 255 }).notNull(), // Anonymized user ID
+  hadReferral: boolean("hadReferral").notNull(), // Whether user was referred to external care
+  preventedCareType: mysqlEnum("preventedCareType", [
+    "jeugd_ggz",
+    "veilig_thuis",
+    "specialistische_zorg",
+    "uithuisplaatsing"
+  ]), // Type of care that was prevented (null if hadReferral = true)
+  appName: mysqlEnum("appName", ["matti", "opvoedmaatje"]).notNull(),
+  trackedAt: timestamp("trackedAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ReferralTracking = typeof referralTracking.$inferSelect;
+export type InsertReferralTracking = typeof referralTracking.$inferInsert;
+
+/**
+ * Cost configuration table for customizable regional pricing.
+ */
+export const costConfig = mysqlTable("cost_config", {
+  id: int("id").autoincrement().primaryKey(),
+  careType: varchar("careType", { length: 100 }).notNull().unique(),
+  costAmount: int("costAmount").notNull(), // Cost in euros
+  description: text("description"),
+  updatedBy: int("updatedBy").notNull().references(() => users.id),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CostConfig = typeof costConfig.$inferSelect;
+export type InsertCostConfig = typeof costConfig.$inferInsert;

@@ -6,6 +6,7 @@ import { analyticsRouter } from "./routers/analytics";
 import { apiKeysRouter } from "./routers/apiKeys";
 import { demographicsRouter } from "./routers/demographics";
 import { engagementRouter } from "./routers/engagement";
+import { fundingRouter } from "./routers/funding";
 
 export const appRouter = router({
   system: systemRouter,
@@ -23,6 +24,7 @@ export const appRouter = router({
   apiKeys: apiKeysRouter,
   demographics: demographicsRouter,
   engagement: engagementRouter,
+  funding: fundingRouter,
 });
 
 export type AppRouter = typeof appRouter;

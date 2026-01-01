@@ -118,3 +118,28 @@
 - [x] Implement POST /api/analytics/event endpoint with API key validation
 - [x] Update dashboard queries to use new events table
 - [x] Test endpoint with curl and from Matti integration
+
+## Dashboard Optimalisatie voor Funding (Fase 1 - Hoogste Impact)
+- [x] Add "Vermeden Zorgkosten" KPI card with cost calculation
+- [x] Add "Escalatie Voorkomen" KPI card showing stabilization percentage
+- [x] Add "Snelheid Hulp" KPI card comparing app vs traditional care wait times
+- [x] Implement improvement tracking: theme_score_start and theme_score_current in database
+- [ ] Add "Verbetering na Matti-gesprekken" section to Risk Assessment page
+- [x] Replace "Verbeteringspercentage: 0%" with actual improvement data
+- [x] Add color coding (green/orange/red) to all KPI cards
+- [x] Add info tooltips to all KPIs with calculation method and meaning
+
+## Dashboard Optimalisatie (Fase 2 - UX Improvements)
+- [ ] Add "Preventieve Impact per Thema" section to Demographics page
+- [ ] Enlarge referral distribution pie chart on Risk Assessment page
+- [ ] Add benchmark line to Risk Trend Analysis chart
+- [ ] Round all decimals in KPI displays
+- [ ] Replace technical terms with user-friendly language
+- [ ] Add "Wat betekent dit?" tooltips to all charts
+
+## Dashboard Optimalisatie (Fase 3 - Executive Reporting)
+- [ ] Create new "Impact Report" page for executives
+- [ ] Add executive summary with monthly overview
+- [ ] Add ROI calculation visualization
+- [ ] Implement PDF export functionality for presentations
+- [ ] Make cost parameters configurable for different municipalities

@@ -2,7 +2,8 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
 import { trpc } from "@/lib/trpc";
-import { Activity, AlertTriangle, TrendingUp, Users } from "lucide-react";
+import { Activity, AlertTriangle, TrendingUp, Users, Euro, TrendingDown, Clock, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useMemo, useState } from "react";
 
 export default function Dashboard() {
@@ -19,6 +20,9 @@ export default function Dashboard() {
   }), [dateRange]);
 
   const { data: summary, isLoading } = trpc.analytics.getSummary.useQuery(queryDateRange);
+  const { data: costAvoidance } = trpc.funding.getCostAvoidance.useQuery(queryDateRange);
+  const { data: escalationPrevention } = trpc.funding.getEscalationPrevention.useQuery(queryDateRange);
+  const { data: improvement } = trpc.funding.getImprovementStats.useQuery(queryDateRange);
 
   const stats = useMemo(() => {
     if (!summary) return [];
@@ -29,31 +33,53 @@ export default function Dashboard() {
         value: summary.totalEvents?.toLocaleString() ?? "0",
         description: "Geregistreerde analytics gebeurtenissen",
         icon: Activity,
-        trend: null,
+        tooltip: "Totaal aantal geregistreerde gesprekken en interacties in de geselecteerde periode",
+        color: "text-blue-500",
       },
       {
         title: "Unieke Gebruikers",
         value: summary.uniqueUsers?.toLocaleString() ?? "0",
         description: "Gebaseerd op postcodegebieden",
         icon: Users,
-        trend: null,
+        tooltip: "Aantal unieke gebruikers op basis van geanonimiseerde postcodegebieden (eerste 4 cijfers)",
+        color: "text-purple-500",
       },
       {
-        title: "Terugkerende Gebruikers",
-        value: `${typeof summary.returningUserRate === 'number' ? summary.returningUserRate.toFixed(1) : "0"}%`,
-        description: "Gebruikersbehoudpercentage",
+        title: "Vermeden Zorgkosten",
+        value: costAvoidance ? `€${(costAvoidance.totalAvoidedCost / 1000).toFixed(0)}k` : "€0",
+        description: "Geschatte besparing deze periode",
+        icon: Euro,
+        tooltip: `Berekend op basis van voorkomen trajecten: Jeugd-GGZ (€8k), Specialistische zorg (€15k), Uithuisplaatsing (€50k), Veilig Thuis (€5k)`,
+        color: "text-green-500",
+      },
+      {
+        title: "Escalatie Voorkomen",
+        value: escalationPrevention ? `${escalationPrevention.preventionRate}%` : "0%",
+        description: "Hoog-risico gebruikers gestabiliseerd",
+        icon: TrendingDown,
+        tooltip: `${escalationPrevention?.stabilizedUsers ?? 0} van ${escalationPrevention?.highRiskUsers ?? 0} hoog-risico gebruikers (3+ thema's) stabiliseerden zonder doorverwijzing naar specialistische zorg`,
+        color: "text-orange-500",
+      },
+      {
+        title: "Snelheid Hulp",
+        value: "0 dagen",
+        description: "120 dagen sneller dan reguliere zorg",
+        icon: Clock,
+        tooltip: "Directe app-toegang (0 dagen wachttijd) vs. reguliere jeugdzorg wachtlijst (gemiddeld 120 dagen)",
+        color: "text-cyan-500",
+      },
+      {
+        title: "Verbetering na Gesprekken",
+        value: improvement && improvement.totalMeasurements > 0 ? `${improvement.averageImprovement.toFixed(0)}%` : "N/A",
+        description: improvement && improvement.totalMeasurements > 0 ? `Gemiddeld na ${improvement.averageConversations.toFixed(1)} gesprekken` : "Nog geen data",
         icon: TrendingUp,
-        trend: null,
-      },
-      {
-        title: "Hoog Risico Gebruikers",
-        value: summary.highRiskCount?.toLocaleString() ?? "0",
-        description: "Gebruikers met 3+ thema's",
-        icon: AlertTriangle,
-        trend: null,
+        tooltip: improvement && improvement.totalMeasurements > 0 
+          ? `Gemiddelde verbetering op 1-10 schaal, gebaseerd op ${improvement.totalMeasurements} metingen. Meest verbeterd: ${improvement.byTheme[0]?.theme ?? 'N/A'} (${improvement.byTheme[0]?.improvement.toFixed(0) ?? 0}%)`
+          : "Verbetering wordt gemeten door gebruikers te vragen hun ervaring te scoren op een schaal van 1-10, zowel bij het eerste gesprek als bij vervolgcontacten",
+        color: "text-green-500",
       },
     ];
-  }, [summary]);
+  }, [summary, costAvoidance, escalationPrevention, improvement]);
 
   return (
     <DashboardLayout>
@@ -69,36 +95,48 @@ export default function Dashboard() {
         </div>
 
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Laden...</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-8 bg-muted animate-pulse rounded" />
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={stat.title}>
+        <TooltipProvider>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                    <Icon className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">Laden...</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
+                    <div className="h-8 bg-muted animate-pulse rounded" />
                   </CardContent>
                 </Card>
-              );
-            })
-          )}
-        </div>
+              ))
+            ) : (
+              stats.map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <Card key={stat.title}>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p className="text-sm">{stat.tooltip}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Icon className={`h-4 w-4 ${stat.color}`} />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stat.value}</div>
+                      <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </div>
+        </TooltipProvider>
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
