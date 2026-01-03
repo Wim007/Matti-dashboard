@@ -1,4 +1,4 @@
-# Matti & Opvoedmaatje Analytics Dashboard
+# Dashboard voor Matti en Opvoedmaatje
 
 Een uitgebreid analytics dashboard platform voor het verzamelen, opslaan en visualiseren van geanonimiseerde gebruiksdata van de Matti en Opvoedmaatje gezinsondersteuning apps.
 
