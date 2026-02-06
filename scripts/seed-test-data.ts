@@ -21,19 +21,23 @@ const POSTAL_CODES = [
   '9700', '9710', '9720', '9750', // Groningen
 ];
 
+// Official 9 Matti themes
 const THEMES = [
-  'school',
-  'pesten',
-  'vriendschap',
-  'gezin',
-  'emoties',
-  'zelfvertrouwen',
-  'toekomst',
-  'relaties',
-  'stress',
-  'identiteit',
-  'ouders',
-  'huiswerk',
+  'School',
+  'Vrienden',
+  'Thuis',
+  'Gevoelens',
+  'Liefde',
+  'Vrije Tijd',
+  'Toekomst',
+  'Jezelf',
+  'Gewoon kletsen',
+];
+
+// Sub-themes that can appear alongside main themes
+const SUB_THEMES = [
+  'Pesten (algemeen)',
+  'Pesten (online/cyberpesten)',
 ];
 
 const REFERRAL_TYPES = [
@@ -59,13 +63,19 @@ function randomBool(probability = 0.5) {
   return Math.random() < probability;
 }
 
-// Helper to generate random themes (1-5 themes per session)
+// Helper to generate random themes (1-3 main themes + optional sub-theme)
 function generateThemes() {
-  const count = randomInt(1, 5);
+  const count = randomInt(1, 3);
   const selected = new Set();
   while (selected.size < count) {
     selected.add(randomChoice(THEMES));
   }
+  
+  // 20% chance to add a sub-theme (pesten)
+  if (randomBool(0.2)) {
+    selected.add(randomChoice(SUB_THEMES));
+  }
+  
   return Array.from(selected);
 }
 

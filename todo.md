@@ -190,3 +190,25 @@
 - [ ] Implement 9 Matti themes visualization (School, Vrienden, Thuis, Gevoelens, Liefde, Vrije Tijd, Toekomst, Jezelf, Gewoon kletsen)
 - [ ] Show per-theme metrics: frequency, average duration, age group distribution
 - [ ] Test all pages with Matti-only data filtering
+
+## Phase 3: Data Filtering Implementation
+- [x] Update analytics router to filter by app_type='matti'
+- [x] Add age range filter (12-21 years) to all queries
+- [x] Test all dashboard pages with filtered data
+- [x] Verify no Opvoedmaatje data appears in visualizations
+
+## Phase 4: Official Matti Themes Implementation
+- [x] Create shared/themes.ts with 9 official Matti themes
+- [x] Add sub-themes: Pesten (algemeen), Pesten (online/cyberpesten)
+- [x] Create new "Thema's & Onderwerpen" page in navigation
+- [x] Implement theme frequency visualization (9 main themes)
+- [x] Add per-theme metrics: frequency, average duration, age distribution
+- [x] Show sub-theme breakdown for themes with sub-categories
+- [x] Test themes page with filtered Matti data
+
+## Phase 5: Enhanced Risk Tracking
+- [x] Review current referral tracking implementation
+- [x] Add risk escalation prevention metrics
+- [x] Implement theme-based risk indicators
+- [x] Add safety signal tracking per theme
+- [x] Test risk assessment page with enhanced metrics

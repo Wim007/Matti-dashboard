@@ -8,10 +8,17 @@
 import { getDb } from '../server/db';
 import { improvementScores, referralTracking, costConfig } from '../drizzle/schema';
 
+// Official 9 Matti themes
 const THEMES = [
-  'pesten', 'school', 'stress', 'identiteit', 'relaties',
-  'ouders', 'gezin', 'toekomst', 'emoties', 'vriendschap',
-  'zelfvertrouwen', 'schulden', 'werk', 'gezondheid'
+  'School',
+  'Vrienden',
+  'Thuis',
+  'Gevoelens',
+  'Liefde',
+  'Vrije Tijd',
+  'Toekomst',
+  'Jezelf',
+  'Gewoon kletsen',
 ];
 
 const CARE_TYPES = ['jeugd_ggz', 'veilig_thuis', 'specialistische_zorg', 'uithuisplaatsing'] as const;

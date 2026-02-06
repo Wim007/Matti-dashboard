@@ -10,9 +10,13 @@ export interface AnalyticsFilters {
 
 function buildConditions(filters: AnalyticsFilters) {
   const conditions = [];
-  if (filters.appName) {
-    conditions.push(eq(analyticsEvents.appName, filters.appName));
-  }
+  
+  // Always filter for Matti app only
+  conditions.push(eq(analyticsEvents.appName, 'matti'));
+  
+  // Always filter for youth ages 12-21 (using age groups)
+  conditions.push(sql`${analyticsEvents.ageGroup} IN ('12-14', '15-17', '18-21')`);
+  
   if (filters.startDate) {
     conditions.push(gte(analyticsEvents.timestamp, filters.startDate));
   }
