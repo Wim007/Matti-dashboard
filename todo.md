@@ -176,3 +176,17 @@
 - [x] Update page titles and metadata
 - [x] Update documentation references
 - [x] Test all pages show correct name
+
+## Matti-Specific Dashboard Adaptation (Must-Have Week 1)
+- [x] Update branding from "Dashboard voor Matti en Opvoedmaatje" to "Matti Dashboard - Jongeren 12-21 jaar"
+- [x] Update description to "Analytics dashboard voor Matti - AI-assistent voor jongeren tussen 12-21 jaar"
+- [x] Change age groups from current to: 12-14 jaar, 15-17 jaar, 18-21 jaar
+- [x] Remove "Ouder" user type from all visualizations
+- [x] Replace "Jongere vs Ouder" chart with "Nieuwe vs Terugkerende gebruikers"
+- [x] Replace "Gezinstype Verdeling" with "Wat jongeren over ouders zeggen" chart
+- [x] Update seed scripts to generate Matti-only data with new age groups
+- [ ] Add data filtering: app_type = 'matti' AND user_age >= 12 AND user_age <= 21
+- [ ] Add new "Thema's & Onderwerpen" page to sidebar navigation
+- [ ] Implement 9 Matti themes visualization (School, Vrienden, Thuis, Gevoelens, Liefde, Vrije Tijd, Toekomst, Jezelf, Gewoon kletsen)
+- [ ] Show per-theme metrics: frequency, average duration, age group distribution
+- [ ] Test all pages with Matti-only data filtering

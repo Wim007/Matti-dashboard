@@ -50,18 +50,20 @@ export default function Demographics() {
     }));
   }, [userTypes]);
 
-  const familyTypeData = useMemo(() => {
-    if (!familyTypes) return [];
-    const labels: Record<string, string> = {
-      eenouder: "Eenouder",
-      tweeouder: "Tweeouder",
-      samengesteld: "Samengesteld",
-    };
-    return familyTypes.map((item) => ({
-      name: labels[item.familyType || ""] || item.familyType,
-      value: Number(item.count),
-    }));
-  }, [familyTypes]);
+  // Filter themes related to parents/family
+  const parentRelatedThemes = useMemo(() => {
+    if (!themes) return [];
+    const parentKeywords = ['ouder', 'thuis', 'gezin', 'familie', 'moeder', 'vader', 'broer', 'zus'];
+    return themes
+      .filter(item => parentKeywords.some(keyword => item.theme.toLowerCase().includes(keyword)))
+      .slice(0, 5)
+      .map((item) => ({
+        name: item.theme,
+        value: item.count,
+      }));
+  }, [themes]);
+
+  const familyTypeData = parentRelatedThemes;
 
   const themeData = useMemo(() => {
     if (!themes) return [];
@@ -125,49 +127,26 @@ export default function Demographics() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Gebruikerstype Verdeling</CardTitle>
-              <CardDescription>Jongere vs Ouder</CardDescription>
+              <CardTitle>Nieuwe vs Terugkerende Gebruikers</CardTitle>
+              <CardDescription>Gebruikersbetrokkenheid</CardDescription>
             </CardHeader>
             <CardContent>
-              {userTypesLoading ? (
-                <div className="h-[300px] flex items-center justify-center">
-                  <div className="animate-pulse text-muted-foreground">Laden...</div>
+              <div className="h-[300px] flex items-center justify-center">
+                <div className="text-center space-y-2">
+                  <div className="text-muted-foreground">Functionaliteit in ontwikkeling</div>
+                  <div className="text-sm text-muted-foreground/70">Data wordt verzameld zodra tracking geïmplementeerd is</div>
                 </div>
-              ) : userTypeData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={userTypeData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {userTypeData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  Geen gegevens beschikbaar
-                </div>
-              )}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Gezinstype Verdeling</CardTitle>
-              <CardDescription>Voor oudergebruikers</CardDescription>
+              <CardTitle>Wat jongeren over ouders zeggen</CardTitle>
+              <CardDescription>Thema's over ouders en gezin</CardDescription>
             </CardHeader>
             <CardContent>
-              {familyTypesLoading ? (
+              {themesLoading ? (
                 <div className="h-[300px] flex items-center justify-center">
                   <div className="animate-pulse text-muted-foreground">Laden...</div>
                 </div>

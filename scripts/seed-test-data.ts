@@ -5,10 +5,10 @@ import { analyticsEvents } from '../drizzle/schema.js';
 const db = drizzle(process.env.DATABASE_URL);
 
 // Realistic data distributions
-const AGE_GROUPS = ['13-15', '16-18', '19-21', '22-25'];
-const USER_TYPES = ['jongere', 'ouder'];
+const AGE_GROUPS = ['12-14', '15-17', '18-21'];
+const USER_TYPES = ['jongere']; // Matti is only for youth
 const FAMILY_TYPES = ['eenouder', 'tweeouder', 'samengesteld'];
-const APPS = ['matti', 'opvoedmaatje'];
+const APPS = ['matti']; // Dashboard is now Matti-only
 
 // Dutch postal code areas (first 4 digits)
 const POSTAL_CODES = [
