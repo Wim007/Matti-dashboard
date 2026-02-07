@@ -21,7 +21,7 @@ const POSTAL_CODES = [
   '9700', '9710', '9720', '9750', // Groningen
 ];
 
-// Official 9 Matti themes
+// Official 10 Matti themes
 const THEMES = [
   'School',
   'Vrienden',
@@ -31,14 +31,28 @@ const THEMES = [
   'Vrije Tijd',
   'Toekomst',
   'Jezelf',
+  'Pesten',
   'Gewoon kletsen',
 ];
 
-// Sub-themes that can appear alongside main themes
-const SUB_THEMES = [
-  'Pesten (algemeen)',
-  'Pesten (online/cyberpesten)',
+// Sub-themes under Pesten theme
+const PESTEN_SUB_THEMES = [
+  'Pesten (persoonlijk/op school)',
+  'Cyberpesten (online/social media)',
 ];
+
+// Initial concerns for behavior change tracking
+const INITIAL_CONCERNS = [
+  'Veel schermtijd',
+  'Weinig beweging',
+  'Geen hobby\'s',
+  'Pesten op school',
+  'Eenzaamheid',
+  'Schoolstress',
+  'Slaapproblemen',
+];
+
+const OUTCOME_STATUSES = ['ongoing', 'improved', 'resolved', 'escalated'];
 
 const REFERRAL_TYPES = [
   'jeugd-ggz',
@@ -71,9 +85,9 @@ function generateThemes() {
     selected.add(randomChoice(THEMES));
   }
   
-  // 20% chance to add a sub-theme (pesten)
-  if (randomBool(0.2)) {
-    selected.add(randomChoice(SUB_THEMES));
+  // If Pesten theme is selected, 50% chance to add specific sub-theme
+  if (selected.has('Pesten') && randomBool(0.5)) {
+    selected.add(randomChoice(PESTEN_SUB_THEMES));
   }
   
   return Array.from(selected);
@@ -131,6 +145,14 @@ function generateEvent() {
   // Add self-reported improvement for returning users (50% report improvement)
   if (isReturningUser && randomBool(0.5)) {
     event.selfReportedImprovement = true;
+  }
+
+  // Add behavior change tracking for 40% of events
+  if (randomBool(0.4)) {
+    event.initialConcern = randomChoice(INITIAL_CONCERNS);
+    event.outcomeStatus = randomChoice(OUTCOME_STATUSES);
+    event.actionsCompleted = randomInt(0, 8);
+    event.interventionDays = randomInt(3, 45);
   }
 
   return event;

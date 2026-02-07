@@ -9,6 +9,7 @@ import { engagementRouter } from "./routers/engagement";
 import { fundingRouter } from "./routers/funding";
 import { pdfRouter } from "./routers/pdf";
 import { themesRouter } from "./routers/themes";
+import { behaviorRouter } from "./routers/behavior";
 
 export const appRouter = router({
   system: systemRouter,
@@ -29,6 +30,7 @@ export const appRouter = router({
   pdf: pdfRouter,
   apiKeys: apiKeysRouter,
   themes: themesRouter,
+  behavior: behaviorRouter,
 });
 
 export type AppRouter = typeof appRouter;

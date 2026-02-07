@@ -1,6 +1,6 @@
 /**
  * Official Matti Themes Configuration
- * 9 main themes for youth conversations (ages 12-21)
+ * 10 main themes for youth conversations (ages 12-21)
  */
 
 export const MATTI_THEMES = [
@@ -12,20 +12,21 @@ export const MATTI_THEMES = [
   'Vrije Tijd',
   'Toekomst',
   'Jezelf',
+  'Pesten',
   'Gewoon kletsen',
 ] as const;
 
 export type MattiTheme = typeof MATTI_THEMES[number];
 
 /**
- * Sub-themes that can appear under multiple main themes
+ * Sub-themes under Pesten main theme
  */
-export const MATTI_SUB_THEMES = {
-  'Pesten (algemeen)': ['School', 'Vrienden', 'Gevoelens'],
-  'Pesten (online/cyberpesten)': ['School', 'Vrienden', 'Gevoelens'],
-} as const;
+export const PESTEN_SUB_THEMES = [
+  'Pesten (persoonlijk/op school)',
+  'Cyberpesten (online/social media)',
+] as const;
 
-export type MattiSubTheme = keyof typeof MATTI_SUB_THEMES;
+export type PestenSubTheme = typeof PESTEN_SUB_THEMES[number];
 
 /**
  * Theme descriptions for UI tooltips
@@ -39,6 +40,7 @@ export const THEME_DESCRIPTIONS: Record<MattiTheme, string> = {
   'Vrije Tijd': 'Gesprekken over hobbies, sport, gaming en vrijetijdsbesteding',
   'Toekomst': 'Gesprekken over toekomstplannen, carrière en levensdoelen',
   'Jezelf': 'Gesprekken over identiteit, zelfbeeld en persoonlijke ontwikkeling',
+  'Pesten': 'Gesprekken over pesten op school, online pesten (cyberpesten) en pestgedrag',
   'Gewoon kletsen': 'Informele gesprekken zonder specifiek thema',
 };
 
@@ -54,6 +56,7 @@ export const THEME_COLORS: Record<MattiTheme, string> = {
   'Vrije Tijd': '#8b5cf6',  // purple
   'Toekomst': '#06b6d4',    // cyan
   'Jezelf': '#84cc16',      // lime
+  'Pesten': '#dc2626',      // dark red (alert color for serious topic)
   'Gewoon kletsen': '#6b7280', // gray
 };
 

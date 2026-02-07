@@ -224,3 +224,24 @@
 - [x] Integrate age filter into Risk Assessment page
 - [x] Test CSV export functionality
 - [x] Test age filtering across all pages
+
+## Pesten Theme & Behavior Change Tracking
+- [x] Add "Pesten" as 10th main theme in shared/themes.ts
+- [x] Add sub-categories: "Pesten (persoonlijk)" and "Cyberpesten (online)"
+- [x] Update MATTI_THEMES array with Pesten theme
+- [x] Add Pesten theme color to THEME_COLORS
+- [x] Extend analytics_events schema with behavior_change fields
+- [x] Add initial_concern and outcome_status columns
+- [x] Add actions_completed column for tracking
+- [x] Create behavior change queries in server/db-behavior.ts
+- [x] Implement getScreenTimeToActionMetrics query
+- [x] Implement getBehaviorChangeTimeline query
+- [x] Create behavior router with tRPC procedures
+- [x] Add "Van Passief naar Actief" section to Impact Report page
+- [x] Show screen time → active hobby conversion rate
+- [x] Display average intervention duration
+- [x] Add ROI calculation for municipalities
+- [x] Update seed scripts with Pesten theme data
+- [x] Generate behavior change test data (screen time → sport)
+- [x] Test Pesten theme visualization
+- [x] Test behavior change metrics display

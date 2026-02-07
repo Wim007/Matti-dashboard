@@ -40,6 +40,11 @@ export const analyticsEvents = mysqlTable("analytics_events", {
   selfReportedImprovement: boolean("selfReportedImprovement"),
   isHighRisk: boolean("isHighRisk").notNull(),
   safetySignal: boolean("safetySignal").notNull(),
+  // Behavior change tracking fields
+  initialConcern: varchar("initialConcern", { length: 255 }), // e.g., "Veel schermtijd", "Pesten"
+  outcomeStatus: mysqlEnum("outcomeStatus", ["ongoing", "improved", "resolved", "escalated"]),
+  actionsCompleted: int("actionsCompleted").default(0), // Number of actions/rewards completed
+  interventionDays: int("interventionDays"), // Days between first and last conversation
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

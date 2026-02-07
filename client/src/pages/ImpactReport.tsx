@@ -2,6 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
+import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
 import { trpc } from "@/lib/trpc";
 import { Download, TrendingUp, Euro, Users, Shield, Clock } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -15,15 +16,20 @@ export default function ImpactReport() {
     return { from, to };
   });
 
+  const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
-  }), [dateRange]);
+    ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
+  }), [dateRange, ageGroup]);
 
   const { data: improvementStats } = trpc.funding.getImprovementStats.useQuery(queryDateRange);
   const { data: costAvoidance } = trpc.funding.getCostAvoidance.useQuery(queryDateRange);
   const { data: escalationPrevention } = trpc.funding.getEscalationPrevention.useQuery(queryDateRange);
   const { data: summary } = trpc.analytics.getSummary.useQuery(queryDateRange);
+  const { data: screenTimeMetrics } = trpc.behavior.screenTimeToAction.useQuery(queryDateRange);
+  const { data: behaviorROI } = trpc.behavior.roi.useQuery(queryDateRange);
 
   const roiData = useMemo(() => {
     if (!costAvoidance) return [];
@@ -70,6 +76,7 @@ export default function ImpactReport() {
             </p>
           </div>
           <div className="flex gap-3">
+            <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
             <DateRangeFilter value={dateRange} onChange={setDateRange} />
             <Button onClick={handleExportPDF} variant="outline">
               <Download className="mr-2 h-4 w-4" />
@@ -208,6 +215,84 @@ export default function ImpactReport() {
 
               <div className="text-sm text-muted-foreground">
                 * ROI berekend als (Vermeden Kosten - Operationele Kosten) / Operationele Kosten × 100%
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Behavior Change: Screen Time to Action */}
+        <Card className="border-blue-500/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-blue-500" />
+              Van Passief naar Actief
+            </CardTitle>
+            <CardDescription>
+              Gedragsverandering: Schermtijd → Actieve Bezigheden
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 md:grid-cols-3 mb-6">
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-1">Totaal Interventies</div>
+                <div className="text-3xl font-bold">{screenTimeMetrics?.totalCases || 0}</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Jongeren met schermtijd-zorgen
+                </div>
+              </div>
+              
+              <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-1">Succesvol Verbeterd</div>
+                <div className="text-3xl font-bold text-green-500">
+                  {screenTimeMetrics?.conversionRate.toFixed(0) || 0}%
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {screenTimeMetrics?.improved || 0} jongeren naar actieve hobby
+                </div>
+              </div>
+              
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-1">Gem. Interventieduur</div>
+                <div className="text-3xl font-bold">{screenTimeMetrics?.avgInterventionDays || 0} dagen</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Van eerste gesprek tot actie
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2" />
+                <div>
+                  <p className="font-medium">Meetbare Gedragsverandering</p>
+                  <p className="text-sm text-muted-foreground">
+                    {screenTimeMetrics?.improved || 0} jongeren zijn succesvol overgestapt van passieve schermtijd naar actieve bezigheden 
+                    zoals sport, muziek of sociale activiteiten. Dit draagt bij aan betere fysieke en mentale gezondheid.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2" />
+                <div>
+                  <p className="font-medium">Actie-gedreven Ondersteuning</p>
+                  <p className="text-sm text-muted-foreground">
+                    Gemiddeld {screenTimeMetrics?.avgActionsCompleted.toFixed(1) || 0} acties voltooid per interventie. 
+                    Matti helpt jongeren niet alleen met praten, maar ook met concrete stappen naar verandering.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-500 mt-2" />
+                <div>
+                  <p className="font-medium">ROI voor Gemeentes</p>
+                  <p className="text-sm text-muted-foreground">
+                    {behaviorROI?.totalSuccessful || 0} succesvolle interventies voorkomen geschatte 
+                    €{Math.round((behaviorROI?.totalCostAvoidance || 0) / 1000)}k aan toekomstige zorgkosten 
+                    door vroege preventie en gedragsverandering.
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
