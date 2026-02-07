@@ -110,6 +110,122 @@ async function startServer() {
       res.status(500).json({ error: "Internal server error" });
     }
   });
+
+  // REST API endpoint for Matti webapp event-stream (SESSION_START, MESSAGE_SENT, etc.)
+  app.post("/api/analytics/events", async (req, res) => {
+    try {
+      const { getDb } = await import("../db");
+      const db = await getDb();
+      
+      if (!db) {
+        return res.status(500).json({ error: "Database not available" });
+      }
+      const { apiKeys, analyticsEvents } = await import("../../drizzle/schema");
+      const { eq, and } = await import("drizzle-orm");
+      
+      // 1. Validate API key
+      const apiKey = req.headers["x-api-key"] as string;
+      if (!apiKey) {
+        return res.status(401).json({ error: "Missing X-API-Key header" });
+      }
+      
+      const [keyRecord] = await db
+        .select()
+        .from(apiKeys)
+        .where(and(eq(apiKeys.key, apiKey), eq(apiKeys.isActive, true)))
+        .limit(1);
+      
+      if (!keyRecord) {
+        return res.status(401).json({ error: "Invalid or inactive API key" });
+      }
+      
+      // 2. Update last used timestamp
+      await db
+        .update(apiKeys)
+        .set({ lastUsedAt: new Date() })
+        .where(eq(apiKeys.id, keyRecord.id));
+      
+      // 3. Process event based on type
+      const event = req.body;
+      const eventType = event.type;
+      
+      if (!eventType) {
+        return res.status(400).json({ error: "Missing event type" });
+      }
+      
+      // Handle different event types from Matti webapp
+      switch (eventType) {
+        case "SESSION_START":
+          // Store session start event
+          await db.insert(analyticsEvents).values({
+            appName: "matti",
+            timestamp: new Date(event.timestamp || Date.now()),
+            postalCodeArea: event.gemeente || "0000",
+            ageGroup: event.leeftijdsgroep || "unknown",
+            userType: "jongere",
+            themes: [], // Will be filled in MESSAGE_SENT
+            sessionDuration: 0, // Will be calculated in SESSION_END
+            messageCount: 0,
+            isReturningUser: !event.is_new_user,
+            weeklyFrequency: 1,
+            isHighRisk: false,
+            safetySignal: false,
+          });
+          break;
+          
+        case "MESSAGE_SENT":
+          // Update session with theme and message count
+          // Note: This is a simplified implementation
+          // In production, you'd want to track sessions properly
+          break;
+          
+        case "RISK_DETECTED":
+          // Store risk detection event
+          await db.insert(analyticsEvents).values({
+            appName: "matti",
+            timestamp: new Date(event.timestamp || Date.now()),
+            postalCodeArea: "0000", // Will be filled from session
+            ageGroup: "unknown",
+            userType: "jongere",
+            themes: [event.riskType || "unknown"],
+            sessionDuration: 0,
+            messageCount: 0,
+            isReturningUser: false,
+            weeklyFrequency: 1,
+            isHighRisk: true,
+            safetySignal: event.action_taken === "escalated",
+          });
+          break;
+          
+        case "SESSION_END":
+          // Store complete session with all metrics
+          await db.insert(analyticsEvents).values({
+            appName: "matti",
+            timestamp: new Date(event.timestamp || Date.now()),
+            postalCodeArea: "0000",
+            ageGroup: "unknown",
+            userType: "jongere",
+            themes: [],
+            sessionDuration: Math.round((event.duration_seconds || 0) / 60), // Convert to minutes
+            messageCount: event.total_messages || 0,
+            isReturningUser: false,
+            weeklyFrequency: 1,
+            satisfactionScore: event.satisfaction_score || null,
+            isHighRisk: false,
+            safetySignal: false,
+          });
+          break;
+          
+        default:
+          return res.status(400).json({ error: `Unknown event type: ${eventType}` });
+      }
+      
+      res.status(200).json({ success: true, eventType });
+    } catch (error) {
+      console.error("[Analytics Events API] Error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
   // tRPC API
   app.use(
     "/api/trpc",

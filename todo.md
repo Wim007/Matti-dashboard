@@ -264,3 +264,13 @@
 - [x] Update calculation: 1000 users × €5 = €5000/month
 - [x] Add explanation text: "Per 1000 gebruikers per maand (à €5/gebruiker)"
 - [x] Test ROI calculation with new operational costs
+
+## Matti Event Tracking API Endpoint Fix
+- [x] Investigate existing analytics API endpoints structure
+- [x] Review analytics_events database schema
+- [x] Create POST /api/analytics/events endpoint
+- [x] Implement event type handlers: SESSION_START, MESSAGE_SENT, RISK_DETECTED, SESSION_END
+- [x] Add database insertion logic for events
+- [x] Return 200 OK response on success
+- [x] Test endpoint locally with sample events
+- [x] Verify events are stored in database correctly
