@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
+import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
 import { trpc } from "@/lib/trpc";
 import { AlertTriangle, Shield, TrendingDown, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -22,10 +23,13 @@ export default function RiskAssessment() {
     return { from, to };
   });
 
+  const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
-  }), [dateRange]);
+    ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
+  }), [dateRange, ageGroup]);
 
   const { data: riskMetrics, isLoading: riskLoading } = trpc.engagement.riskMetrics.useQuery(queryDateRange);
   const { data: referrals, isLoading: referralsLoading } = trpc.engagement.referrals.useQuery(queryDateRange);
@@ -77,7 +81,10 @@ export default function RiskAssessment() {
               Monitor hoog-risico gebruikers, veiligheidssignalen en verwijzingspatronen
             </p>
           </div>
-          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          <div className="flex items-center gap-3">
+            <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

@@ -22,6 +22,7 @@ const filtersSchema = z.object({
   appName: z.enum(["matti", "opvoedmaatje"]).optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
+  ageGroup: z.enum(['12-14', '15-17', '18-21']).optional(),
 });
 
 export const engagementRouter = router({
@@ -30,6 +31,7 @@ export const engagementRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getSessionDurationTimeSeries(filters);
   }),
@@ -39,6 +41,7 @@ export const engagementRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getMessageCountTimeSeries(filters);
   }),
@@ -48,6 +51,7 @@ export const engagementRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getReferralDistribution(filters);
   }),
@@ -57,6 +61,7 @@ export const engagementRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getRiskMetrics(filters);
   }),

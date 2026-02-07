@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
+import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
 import { trpc } from "@/lib/trpc";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -15,10 +16,13 @@ export default function Demographics() {
     return { from, to };
   });
 
+  const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
-  }), [dateRange]);
+    ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
+  }), [dateRange, ageGroup]);
 
   const { data: ageGroups, isLoading: ageLoading } = trpc.demographics.ageGroups.useQuery(queryDateRange);
   const { data: postalCodes, isLoading: postalLoading } = trpc.demographics.postalCodes.useQuery(queryDateRange);
@@ -83,7 +87,10 @@ export default function Demographics() {
               Gebruikersdemografie en verdelingsanalyse
             </p>
           </div>
-          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          <div className="flex items-center gap-3">
+            <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

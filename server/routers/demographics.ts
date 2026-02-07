@@ -23,6 +23,7 @@ const filtersSchema = z.object({
   appName: z.enum(["matti", "opvoedmaatje"]).optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
+  ageGroup: z.enum(['12-14', '15-17', '18-21']).optional(),
 });
 
 export const demographicsRouter = router({
@@ -31,6 +32,7 @@ export const demographicsRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getDemographicsByAgeGroup(filters);
   }),
@@ -40,6 +42,7 @@ export const demographicsRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getDemographicsByPostalCode(filters);
   }),
@@ -49,6 +52,7 @@ export const demographicsRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getDemographicsByUserType(filters);
   }),
@@ -58,6 +62,7 @@ export const demographicsRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getDemographicsByFamilyType(filters);
   }),
@@ -67,6 +72,7 @@ export const demographicsRouter = router({
       appName: input.appName,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getThemeFrequency(filters);
   }),

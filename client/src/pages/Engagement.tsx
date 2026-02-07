@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
+import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
 import { trpc } from "@/lib/trpc";
 import { Activity, MessageSquare, RefreshCw, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,10 +16,13 @@ export default function Engagement() {
     return { from, to };
   });
 
+  const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
-  }), [dateRange]);
+    ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
+  }), [dateRange, ageGroup]);
 
   const utils = trpc.useUtils();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -79,6 +83,7 @@ export default function Engagement() {
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               Ververs Data
             </Button>
+            <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
             <DateRangeFilter value={dateRange} onChange={setDateRange} />
           </div>
         </div>

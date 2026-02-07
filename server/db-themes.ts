@@ -9,6 +9,7 @@ import { getDb } from "./db";
 export interface ThemeFilters {
   startDate?: Date;
   endDate?: Date;
+  ageGroup?: '12-14' | '15-17' | '18-21';
 }
 
 function buildConditions(filters: ThemeFilters) {
@@ -17,8 +18,12 @@ function buildConditions(filters: ThemeFilters) {
   // Always filter for Matti app only
   conditions.push(eq(analyticsEvents.appName, 'matti'));
   
-  // Always filter for youth ages 12-21 (using age groups)
-  conditions.push(sql`${analyticsEvents.ageGroup} IN ('12-14', '15-17', '18-21')`);
+  // Filter by age group if specified, otherwise all youth ages
+  if (filters.ageGroup) {
+    conditions.push(eq(analyticsEvents.ageGroup, filters.ageGroup));
+  } else {
+    conditions.push(sql`${analyticsEvents.ageGroup} IN ('12-14', '15-17', '18-21')`);
+  }
   
   if (filters.startDate) {
     conditions.push(gte(analyticsEvents.timestamp, filters.startDate));

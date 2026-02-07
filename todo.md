@@ -212,3 +212,15 @@
 - [x] Implement theme-based risk indicators
 - [x] Add safety signal tracking per theme
 - [x] Test risk assessment page with enhanced metrics
+
+## Final Enhancements
+- [x] Add CSV export button to Themes page
+- [x] Implement CSV generation for theme statistics
+- [x] Create AgeGroupFilter component (12-14, 15-17, 18-21, Alle)
+- [x] Integrate age filter into Dashboard page
+- [x] Integrate age filter into Demographics page
+- [x] Integrate age filter into Themes page
+- [x] Integrate age filter into Engagement page
+- [x] Integrate age filter into Risk Assessment page
+- [x] Test CSV export functionality
+- [x] Test age filtering across all pages

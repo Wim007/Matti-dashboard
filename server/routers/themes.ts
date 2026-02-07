@@ -16,6 +16,7 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 const filtersSchema = z.object({
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
+  ageGroup: z.enum(['12-14', '15-17', '18-21']).optional(),
 });
 
 export const themesRouter = router({
@@ -23,6 +24,7 @@ export const themesRouter = router({
     const filters = {
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getThemeStats(filters);
   }),
@@ -31,6 +33,7 @@ export const themesRouter = router({
     const filters = {
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
+      ageGroup: input.ageGroup,
     };
     return await getThemesByAgeGroup(filters);
   }),

@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
+import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
 import { trpc } from "@/lib/trpc";
 import { Activity, AlertTriangle, TrendingUp, Users, Euro, TrendingDown, Clock, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -14,10 +15,13 @@ export default function Dashboard() {
     return { from, to };
   });
 
+  const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
-  }), [dateRange]);
+    ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
+  }), [dateRange, ageGroup]);
 
   const { data: summary, isLoading } = trpc.analytics.getSummary.useQuery(queryDateRange);
   const { data: costAvoidance } = trpc.funding.getCostAvoidance.useQuery(queryDateRange);
@@ -91,7 +95,10 @@ export default function Dashboard() {
               Analytics dashboard voor Matti - AI-assistent voor jongeren tussen 12-21 jaar
             </p>
           </div>
-          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          <div className="flex items-center gap-3">
+            <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          </div>
         </div>
 
 

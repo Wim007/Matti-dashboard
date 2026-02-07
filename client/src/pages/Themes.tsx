@@ -1,11 +1,13 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
+import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
 import { trpc } from "@/lib/trpc";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { MATTI_THEMES, THEME_COLORS, THEME_DESCRIPTIONS } from "../../../shared/themes";
-import { Info } from "lucide-react";
+import { Download, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Themes() {
   const [dateRange, setDateRange] = useState<DateRangeValue>(() => {
@@ -15,10 +17,13 @@ export default function Themes() {
     return { from, to };
   });
 
+  const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
-  }), [dateRange]);
+    ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
+  }), [dateRange, ageGroup]);
 
   const { data: themeStats, isLoading: themeStatsLoading } = trpc.themes.getThemeStats.useQuery(queryDateRange);
   const { data: themesByAge, isLoading: themesByAgeLoading } = trpc.themes.getThemesByAgeGroup.useQuery(queryDateRange);
@@ -35,6 +40,49 @@ export default function Themes() {
       };
     }).sort((a, b) => b.value - a.value);
   }, [themeStats]);
+
+  const exportThemeDataToCSV = () => {
+    if (!themeStats || !themesByAge) return;
+
+    // Prepare CSV data
+    const csvRows = [];
+    
+    // Header
+    csvRows.push(['Thema', 'Aantal Gesprekken', 'Gemiddelde Duur (min)', '12-14 jaar', '15-17 jaar', '18-21 jaar']);
+    
+    // Data rows
+    MATTI_THEMES.forEach(theme => {
+      const stat = themeStats.find((s: { theme: string; count: number; avgDuration: number }) => s.theme === theme);
+      const ageData = themesByAge.filter((item: { theme: string; ageGroup: string; count: number }) => item.theme === theme);
+      
+      const age12_14 = ageData.find((item: { ageGroup: string; count: number }) => item.ageGroup === '12-14')?.count || 0;
+      const age15_17 = ageData.find((item: { ageGroup: string; count: number }) => item.ageGroup === '15-17')?.count || 0;
+      const age18_21 = ageData.find((item: { ageGroup: string; count: number }) => item.ageGroup === '18-21')?.count || 0;
+      
+      csvRows.push([
+        theme,
+        stat?.count || 0,
+        stat?.avgDuration ? Math.round(stat.avgDuration) : 0,
+        age12_14,
+        age15_17,
+        age18_21
+      ]);
+    });
+    
+    // Convert to CSV string
+    const csvContent = csvRows.map(row => row.join(',')).join('\n');
+    
+    // Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `matti-themas-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const themeAgeDistributionData = useMemo(() => {
     if (!themesByAge) return [];
@@ -69,7 +117,19 @@ export default function Themes() {
               Analyse van de 9 Matti-thema's waar jongeren over praten
             </p>
           </div>
-          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportThemeDataToCSV()}
+              disabled={!themeStats || themeStats.length === 0}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Exporteer CSV
+            </Button>
+            <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          </div>
         </div>
 
         {/* Theme Overview Cards */}
