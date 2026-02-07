@@ -250,3 +250,7 @@
 - [x] Update getCostAvoidance query to include behavior change interventions
 - [x] Add behavior change ROI to total cost avoidance calculation
 - [x] Test updated cost avoidance display on Dashboard and Impact Report
+
+## Cost Avoidance Adjustment
+- [x] Update behavior change cost from €3500 to €6500 per successful intervention
+- [x] Test updated cost calculation (50 interventions × €6500 = €325k)

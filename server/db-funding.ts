@@ -201,7 +201,7 @@ export async function getCostAvoidanceStats(dateRange: DateRange = {}): Promise<
     .where(and(...behaviorConditions));
 
   const successfulBehaviorChanges = Number(behaviorResults[0]?.count) || 0;
-  const behaviorChangeCostAvoidance = successfulBehaviorChanges * 3500; // €3500 per successful intervention
+  const behaviorChangeCostAvoidance = successfulBehaviorChanges * 6500; // €6500 per successful intervention
 
   // Calculate total cost (referrals + behavior change)
   const totalAvoidedCost =
@@ -215,7 +215,7 @@ export async function getCostAvoidanceStats(dateRange: DateRange = {}): Promise<
     {
       careType: 'Gedragsverandering (Preventief)',
       count: successfulBehaviorChanges,
-      costPerCase: 3500,
+      costPerCase: 6500,
       totalCost: behaviorChangeCostAvoidance,
     },
     {
