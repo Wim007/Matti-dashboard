@@ -258,3 +258,9 @@
 ## Impact Report Text Correction
 - [x] Update Executive Summary to remove Opvoedmaatje reference
 - [x] Change "Matti en Opvoedmaatje hebben... met jongeren en ouders" to "Matti heeft... met jongeren tussen 12-21 jaar"
+
+## Operational Costs Calculation Update
+- [x] Change operational costs from €2/conversation to €5/user model
+- [x] Update calculation: 1000 users × €5 = €5000/month
+- [x] Add explanation text: "Per 1000 gebruikers per maand (à €5/gebruiker)"
+- [x] Test ROI calculation with new operational costs

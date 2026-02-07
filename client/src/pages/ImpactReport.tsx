@@ -34,8 +34,8 @@ export default function ImpactReport() {
   const roiData = useMemo(() => {
     if (!costAvoidance) return [];
     
-    // Estimated cost of running Matti/Opvoedmaatje (simplified)
-    const estimatedOperatingCost = summary?.totalEvents ? summary.totalEvents * 2 : 1000; // €2 per conversation
+    // Operational costs: €5 per user per month for 1000 users
+    const estimatedOperatingCost = 5000; // 1000 users × €5/user/month
     const savings = costAvoidance.totalAvoidedCost;
     const roi = savings > 0 ? ((savings - estimatedOperatingCost) / estimatedOperatingCost) * 100 : 0;
 
@@ -195,6 +195,9 @@ export default function ImpactReport() {
                   <div className="text-sm text-muted-foreground mb-1">Operationele Kosten</div>
                   <div className="text-2xl font-bold text-destructive">
                     €{roiData[0]?.value.toLocaleString() || 0}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Per 1000 gebruikers/maand (à €5/gebruiker)
                   </div>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
