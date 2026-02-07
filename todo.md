@@ -245,3 +245,8 @@
 - [x] Generate behavior change test data (screen time → sport)
 - [x] Test Pesten theme visualization
 - [x] Test behavior change metrics display
+
+## Cost Avoidance Calculation Update
+- [x] Update getCostAvoidance query to include behavior change interventions
+- [x] Add behavior change ROI to total cost avoidance calculation
+- [x] Test updated cost avoidance display on Dashboard and Impact Report

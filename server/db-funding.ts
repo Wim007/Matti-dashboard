@@ -179,14 +179,45 @@ export async function getCostAvoidanceStats(dateRange: DateRange = {}): Promise<
   const preventedSpecialistCare = typeCounts.get('specialistische_zorg') || 0;
   const preventedOutOfHome = typeCounts.get('uithuisplaatsing') || 0;
 
-  // Calculate total cost
+  // Add behavior change interventions to cost avoidance
+  const behaviorConditions = [
+    eq(analyticsEvents.appName, 'matti'),
+    sql`${analyticsEvents.outcomeStatus} IN ('improved', 'resolved')`,
+    isNotNull(analyticsEvents.initialConcern),
+  ];
+
+  if (startDate) {
+    behaviorConditions.push(gte(analyticsEvents.timestamp, startDate));
+  }
+  if (endDate) {
+    behaviorConditions.push(lte(analyticsEvents.timestamp, endDate));
+  }
+
+  const behaviorResults = await db
+    .select({
+      count: sql<number>`COUNT(*)`
+    })
+    .from(analyticsEvents)
+    .where(and(...behaviorConditions));
+
+  const successfulBehaviorChanges = Number(behaviorResults[0]?.count) || 0;
+  const behaviorChangeCostAvoidance = successfulBehaviorChanges * 3500; // €3500 per successful intervention
+
+  // Calculate total cost (referrals + behavior change)
   const totalAvoidedCost =
     preventedJeugdGGZ * defaultCosts.jeugd_ggz +
     preventedCrisis * defaultCosts.veilig_thuis +
     preventedSpecialistCare * defaultCosts.specialistische_zorg +
-    preventedOutOfHome * defaultCosts.uithuisplaatsing;
+    preventedOutOfHome * defaultCosts.uithuisplaatsing +
+    behaviorChangeCostAvoidance;
 
   const breakdown = [
+    {
+      careType: 'Gedragsverandering (Preventief)',
+      count: successfulBehaviorChanges,
+      costPerCase: 3500,
+      totalCost: behaviorChangeCostAvoidance,
+    },
     {
       careType: 'Jeugd-GGZ',
       count: preventedJeugdGGZ,
