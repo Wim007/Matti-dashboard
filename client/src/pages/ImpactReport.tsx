@@ -97,10 +97,10 @@ export default function ImpactReport() {
             <div className="space-y-6">
               <div className="prose prose-invert max-w-none">
                 <p className="text-lg leading-relaxed">
-                  Matti en Opvoedmaatje hebben in de afgelopen{" "}
+                  Matti heeft in de afgelopen{" "}
                   <strong>{Math.round((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24))} dagen</strong>{" "}
-                  <strong>{summary?.totalEvents || 0} gesprekken</strong> gevoerd met jongeren en ouders.
-                  De apps hebben een meetbare impact op het voorkomen van escalatie en het verminderen van zorgkosten.
+                  <strong>{summary?.totalEvents || 0} gesprekken</strong> gevoerd met jongeren tussen 12-21 jaar.
+                  De app heeft een meetbare impact op het voorkomen van escalatie en het verminderen van zorgkosten.
                 </p>
               </div>
 

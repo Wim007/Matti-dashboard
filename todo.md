@@ -254,3 +254,7 @@
 ## Cost Avoidance Adjustment
 - [x] Update behavior change cost from €3500 to €6500 per successful intervention
 - [x] Test updated cost calculation (50 interventions × €6500 = €325k)
+
+## Impact Report Text Correction
+- [x] Update Executive Summary to remove Opvoedmaatje reference
+- [x] Change "Matti en Opvoedmaatje hebben... met jongeren en ouders" to "Matti heeft... met jongeren tussen 12-21 jaar"
