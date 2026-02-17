@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, appName, postalCodeArea, ageGroup, timestamp, createdAt FROM analytics_events ORDER BY createdAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3bjG5q3gEHRTz8G.ffef126f5708 --database GkTrmFEWBPVzagDkSSuYWq --execute SELECT id, appName, postalCodeArea, ageGroup, timestamp, createdAt FROM analytics_events ORDER BY createdAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "180001",
+      "appName": "matti",
+      "postalCodeArea": "1012",
+      "ageGroup": "15-17",
+      "timestamp": "2026-02-07 22:38:02",
+      "createdAt": "2026-02-07 22:38:02"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tappName\tpostalCodeArea\tageGroup\ttimestamp\tcreatedAt\n180001\tmatti\t1012\t15-17\t2026-02-07 22:38:02\t2026-02-07 22:38:02\n",
+  "stderr": "",
+  "execution_time_ms": 350
+}

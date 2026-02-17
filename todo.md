@@ -274,3 +274,9 @@
 - [x] Return 200 OK response on success
 - [x] Test endpoint locally with sample events
 - [x] Verify events are stored in database correctly
+
+## End-to-End Analytics Integration Test
+- [x] Get active API key from Dashboard (ak_zy2WNb1DSOt9ahf4HuklLfvie12eRn8WT7hD2OxMM_IuIkAK)
+- [x] Test endpoint with curl - SUCCESS (HTTP 200)
+- [x] Verify event is stored in database - CONFIRMED
+- [x] Document Matti webapp configuration instructions (see MATTI_WEBAPP_CONFIG.md)

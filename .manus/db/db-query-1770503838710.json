@@ -1,0 +1,14 @@
+{
+  "query": "SELECT `key`, name FROM api_keys WHERE isActive = 1 AND appName = 'matti' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3bjG5q3gEHRTz8G.ffef126f5708 --database GkTrmFEWBPVzagDkSSuYWq --execute SELECT `key`, name FROM api_keys WHERE isActive = 1 AND appName = 'matti' LIMIT 1;",
+  "rows": [
+    {
+      "key": "ak_zy2WNb1DSOt9ahf4HuklLfvie12eRn8WT7hD2OxMM_IuIkAK",
+      "name": "matti sleutel"
+    }
+  ],
+  "messages": [],
+  "stdout": "key\tname\nak_zy2WNb1DSOt9ahf4HuklLfvie12eRn8WT7hD2OxMM_IuIkAK\tmatti sleutel\n",
+  "stderr": "",
+  "execution_time_ms": 378
+}
