@@ -101,6 +101,7 @@ export async function getAnalyticsEvents(filters?: {
   appName?: "matti" | "opvoedmaatje";
   startDate?: Date;
   endDate?: Date;
+  school?: string;
   limit?: number;
 }) {
   const db = await getDb();
@@ -115,6 +116,9 @@ export async function getAnalyticsEvents(filters?: {
   }
   if (filters?.endDate) {
     conditions.push(lte(analyticsEvents.timestamp, filters.endDate));
+  }
+  if (filters?.school) {
+    conditions.push(eq(analyticsEvents.school, filters.school));
   }
 
   const query = db
@@ -134,6 +138,7 @@ export async function getAnalyticsSummary(filters?: {
   appName?: "matti" | "opvoedmaatje";
   startDate?: Date;
   endDate?: Date;
+  school?: string;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -147,6 +152,9 @@ export async function getAnalyticsSummary(filters?: {
   }
   if (filters?.endDate) {
     conditions.push(lte(analyticsEvents.timestamp, filters.endDate));
+  }
+  if (filters?.school) {
+    conditions.push(eq(analyticsEvents.school, filters.school));
   }
 
   const result = await db
@@ -165,6 +173,20 @@ export async function getAnalyticsSummary(filters?: {
     .where(conditions.length > 0 ? and(...conditions) : undefined);
 
   return result[0];
+}
+
+/** Alle scholen die in de events voorkomen — voor de schoolkiezer in het menu */
+export async function getSchools(): Promise<string[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const rows = await db
+    .selectDistinct({ school: analyticsEvents.school })
+    .from(analyticsEvents)
+    .where(sql`${analyticsEvents.school} IS NOT NULL AND ${analyticsEvents.school} != ''`);
+  return rows
+    .map((r) => r.school)
+    .filter((v): v is string => !!v)
+    .sort((a, b) => a.localeCompare(b, "nl"));
 }
 
 // API Keys

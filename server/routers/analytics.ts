@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { getApiKeyByKey, getAnalyticsEvents, getAnalyticsSummary, insertAnalyticsEvent, updateApiKeyLastUsed } from "../db";
+import { getApiKeyByKey, getAnalyticsEvents, getAnalyticsSummary, getSchools, insertAnalyticsEvent, updateApiKeyLastUsed } from "../db";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 
 const analyticsEventSchema = z.object({
@@ -111,6 +111,7 @@ export const analyticsRouter = router({
         appName: z.enum(["matti", "opvoedmaatje"]).optional(),
         startDate: z.string().datetime().optional(),
         endDate: z.string().datetime().optional(),
+        school: z.string().max(120).optional(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -125,8 +126,20 @@ export const analyticsRouter = router({
         appName: input.appName,
         startDate: input.startDate ? new Date(input.startDate) : undefined,
         endDate: input.endDate ? new Date(input.endDate) : undefined,
+        school: input.school,
       };
 
       return await getAnalyticsSummary(filters);
     }),
+
+  // Scholenlijst voor de schoolkiezer in het menu
+  getSchools: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user.role !== "admin") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Admin access required",
+      });
+    }
+    return await getSchools();
+  }),
 });
