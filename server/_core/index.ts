@@ -8,6 +8,15 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
+// Vangnetten op procesniveau: een onafgevangen fout in een fire-and-forget
+// promise mag de server niet neerhalen
+process.on("unhandledRejection", reason => {
+  console.error("[Process] Unhandled promise rejection:", reason);
+});
+process.on("uncaughtException", err => {
+  console.error("[Process] Uncaught exception:", err);
+});
+
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
     const server = net.createServer();
@@ -33,6 +42,23 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  // Plain HTTP health endpoint — voor UptimeRobot/Railway monitoring
+  app.get("/api/health", async (_req, res) => {
+    let dbOk = false;
+    try {
+      const { getDb } = await import("../db");
+      dbOk = !!(await getDb());
+    } catch {
+      dbOk = false;
+    }
+    res.status(dbOk ? 200 : 503).json({
+      status: dbOk ? "ok" : "error",
+      db: dbOk,
+      ts: new Date().toISOString(),
+    });
+  });
+
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
@@ -242,11 +268,21 @@ async function startServer() {
   }
 
   const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
+  // In productie (Railway) MOET de server op $PORT luisteren — stilletjes
+  // uitwijken naar een andere poort maakt het dashboard onbereikbaar terwijl
+  // het proces "gezond" lijkt. Liever hard falen zodat Railway herstart.
+  const port = process.env.NODE_ENV === "production"
+    ? preferredPort
+    : await findAvailablePort(preferredPort);
 
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
+
+  server.on("error", err => {
+    console.error(`[Server] Kon niet luisteren op poort ${port}:`, err);
+    process.exit(1);
+  });
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);

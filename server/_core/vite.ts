@@ -3,10 +3,12 @@ import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 import path from "path";
-import { createServer as createViteServer } from "vite";
-import viteConfig from "../../vite.config";
 
 export async function setupVite(app: Express, server: Server) {
+  // Dynamische import: vite is een devDependency en mag nooit in het
+  // productie-bundle terechtkomen (top-level import → ERR_MODULE_NOT_FOUND bij boot)
+  const { createServer: createViteServer } = await import("vite");
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
@@ -14,8 +16,7 @@ export async function setupVite(app: Express, server: Server) {
   };
 
   const vite = await createViteServer({
-    ...viteConfig,
-    configFile: false,
+    configFile: path.resolve(import.meta.dirname, "../..", "vite.config.ts"),
     server: serverOptions,
     appType: "custom",
   });
