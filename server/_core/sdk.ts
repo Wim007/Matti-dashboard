@@ -257,6 +257,44 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
+    // Open modus: zolang er geen DASHBOARD_PASSWORD is geconfigureerd, is het
+    // dashboard vrij toegankelijk en telt elke bezoeker als beheerder. Geen
+    // wachtwoord, geen sessie-cookie en geen JWT_SECRET nodig. Zet de env var
+    // DASHBOARD_PASSWORD om het dashboard weer af te schermen.
+    if (!process.env.DASHBOARD_PASSWORD) {
+      const openId = "dashboard-admin";
+      let user = await db.getUserByOpenId(openId);
+      if (!user) {
+        try {
+          await db.upsertUser({
+            openId,
+            name: "Beheerder",
+            loginMethod: "open",
+            role: "admin",
+            lastSignedIn: new Date(),
+          });
+          user = await db.getUserByOpenId(openId);
+        } catch {
+          // database niet beschikbaar — val hieronder terug op een synthetische gebruiker
+        }
+      }
+      // Ook zonder database toegang geven: de dataqueries geven dan hun
+      // eigen foutmeldingen i.p.v. een eeuwige inlog-loop
+      return (
+        user ?? ({
+          id: 0,
+          openId,
+          name: "Beheerder",
+          email: null,
+          loginMethod: "open",
+          role: "admin",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastSignedIn: new Date(),
+        } as User)
+      );
+    }
+
     // Regular authentication flow
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
