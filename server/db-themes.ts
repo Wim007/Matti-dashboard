@@ -7,6 +7,7 @@ import { analyticsEvents } from "../drizzle/schema";
 import { getDb } from "./db";
 
 export interface ThemeFilters {
+  school?: string;
   startDate?: Date;
   endDate?: Date;
   ageGroup?: '12-14' | '15-17' | '18-21';
@@ -25,6 +26,9 @@ function buildConditions(filters: ThemeFilters) {
     conditions.push(sql`${analyticsEvents.ageGroup} IN ('12-14', '15-17', '18-21')`);
   }
   
+  if (filters.school) {
+    conditions.push(eq(analyticsEvents.school, filters.school));
+  }
   if (filters.startDate) {
     conditions.push(gte(analyticsEvents.timestamp, filters.startDate));
   }

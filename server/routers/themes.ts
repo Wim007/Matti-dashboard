@@ -17,6 +17,7 @@ const filtersSchema = z.object({
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
   ageGroup: z.enum(['12-14', '15-17', '18-21']).optional(),
+  school: z.string().max(120).optional(),
 });
 
 export const themesRouter = router({
@@ -25,6 +26,7 @@ export const themesRouter = router({
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
       ageGroup: input.ageGroup,
+      school: input.school,
     };
     return await getThemeStats(filters);
   }),
@@ -34,6 +36,7 @@ export const themesRouter = router({
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
       ageGroup: input.ageGroup,
+      school: input.school,
     };
     return await getThemesByAgeGroup(filters);
   }),

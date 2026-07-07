@@ -40,6 +40,7 @@ export const analyticsEvents = mysqlTable("analytics_events", {
   selfReportedImprovement: boolean("selfReportedImprovement"),
   isHighRisk: boolean("isHighRisk").notNull(),
   safetySignal: boolean("safetySignal").notNull(),
+  school: varchar("school", { length: 120 }), // anoniem schoollabel — nooit herleidbaar tot een persoon
   // Behavior change tracking fields
   initialConcern: varchar("initialConcern", { length: 255 }), // e.g., "Veel schermtijd", "Pesten"
   outcomeStatus: mysqlEnum("outcomeStatus", ["ongoing", "improved", "resolved", "escalated"]),

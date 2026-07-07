@@ -2,6 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
 import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
+import { SchoolFilter, SchoolValue } from "@/components/SchoolFilter";
 import { trpc } from "@/lib/trpc";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -18,12 +19,14 @@ export default function Themes() {
   });
 
   const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+  const [school, setSchool] = useState<SchoolValue>('all');
 
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
     ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
-  }), [dateRange, ageGroup]);
+    school: school !== 'all' ? school : undefined,
+  }), [dateRange, ageGroup, school]);
 
   const { data: themeStats, isLoading: themeStatsLoading } = trpc.themes.getThemeStats.useQuery(queryDateRange);
   const { data: themesByAge, isLoading: themesByAgeLoading } = trpc.themes.getThemesByAgeGroup.useQuery(queryDateRange);
@@ -127,6 +130,7 @@ export default function Themes() {
               <Download className="w-4 h-4 mr-2" />
               Exporteer CSV
             </Button>
+            <SchoolFilter value={school} onChange={setSchool} />
             <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
             <DateRangeFilter value={dateRange} onChange={setDateRange} />
           </div>

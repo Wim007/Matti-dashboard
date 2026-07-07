@@ -36,7 +36,37 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
+// Runtime schema-check: voegt de school-kolom toe als die nog niet bestaat
+// (er draait geen migratiestap bij deploy)
+async function ensureSchema() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    console.warn("[Migrations] DATABASE_URL niet ingesteld — schema-check overgeslagen");
+    return;
+  }
+  try {
+    const mysql = await import("mysql2/promise");
+    const conn = await mysql.createConnection(url);
+    try {
+      const [rows] = await conn.query(
+        "SELECT COUNT(*) AS c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'analytics_events' AND COLUMN_NAME = 'school'"
+      );
+      const count = Array.isArray(rows) ? Number((rows[0] as any)?.c ?? 0) : 0;
+      if (!count) {
+        await conn.query("ALTER TABLE analytics_events ADD COLUMN school VARCHAR(120) NULL");
+        console.log("[Migrations] Kolom analytics_events.school toegevoegd");
+      }
+    } finally {
+      await conn.end();
+    }
+  } catch (err) {
+    console.error("[Migrations] Schema-check mislukt:", err);
+  }
+}
+
 async function startServer() {
+  await ensureSchema();
+
   if (!process.env.JWT_SECRET) {
     console.warn("[Auth] JWT_SECRET niet ingesteld — inloggen zal falen (sessies kunnen niet ondertekend worden)");
   }
@@ -135,6 +165,7 @@ async function startServer() {
         selfReportedImprovement: event.selfReportedImprovement || null,
         isHighRisk: event.isHighRisk,
         safetySignal: event.safetySignal,
+        school: typeof event.school === "string" && event.school.trim() ? event.school.trim().slice(0, 120) : null,
       });
       
       res.status(200).json({ success: true });
@@ -186,73 +217,41 @@ async function startServer() {
         return res.status(400).json({ error: "Missing event type" });
       }
       
-      // Handle different event types from Matti webapp
-      switch (eventType) {
-        case "SESSION_START":
-          // Store session start event
-          await db.insert(analyticsEvents).values({
-            appName: "matti",
-            timestamp: new Date(event.timestamp || Date.now()),
-            postalCodeArea: event.gemeente || "0000",
-            ageGroup: event.leeftijdsgroep || "unknown",
-            userType: "jongere",
-            themes: [], // Will be filled in MESSAGE_SENT
-            sessionDuration: 0, // Will be calculated in SESSION_END
-            messageCount: 0,
-            isReturningUser: !event.is_new_user,
-            weeklyFrequency: 1,
-            isHighRisk: false,
-            safetySignal: false,
-          });
-          break;
-          
-        case "MESSAGE_SENT":
-          // Update session with theme and message count
-          // Note: This is a simplified implementation
-          // In production, you'd want to track sessions properly
-          break;
-          
-        case "RISK_DETECTED":
-          // Store risk detection event
-          await db.insert(analyticsEvents).values({
-            appName: "matti",
-            timestamp: new Date(event.timestamp || Date.now()),
-            postalCodeArea: "0000", // Will be filled from session
-            ageGroup: "unknown",
-            userType: "jongere",
-            themes: [event.riskType || "unknown"],
-            sessionDuration: 0,
-            messageCount: 0,
-            isReturningUser: false,
-            weeklyFrequency: 1,
-            isHighRisk: true,
-            safetySignal: event.action_taken === "escalated",
-          });
-          break;
-          
-        case "SESSION_END":
-          // Store complete session with all metrics
-          await db.insert(analyticsEvents).values({
-            appName: "matti",
-            timestamp: new Date(event.timestamp || Date.now()),
-            postalCodeArea: "0000",
-            ageGroup: "unknown",
-            userType: "jongere",
-            themes: [],
-            sessionDuration: Math.round((event.duration_seconds || 0) / 60), // Convert to minutes
-            messageCount: event.total_messages || 0,
-            isReturningUser: false,
-            weeklyFrequency: 1,
-            satisfactionScore: event.satisfaction_score || null,
-            isHighRisk: false,
-            safetySignal: false,
-          });
-          break;
-          
-        default:
-          return res.status(400).json({ error: `Unknown event type: ${eventType}` });
+      // Uniforme verwerking: Matti/Opvoedmaatje sturen het geconverteerde
+      // formaat (appName, postalCodeArea, ageGroup, themes, ...). De oude
+      // switch las veldnamen die nooit werden meegestuurd, waardoor events
+      // als "0000/unknown" binnenkwamen en INTERVENTION_OUTCOME werd geweigerd.
+      const KNOWN_TYPES = ["SESSION_START", "MESSAGE_SENT", "RISK_DETECTED", "SESSION_END", "INTERVENTION_OUTCOME"];
+      if (!KNOWN_TYPES.includes(eventType)) {
+        return res.status(400).json({ error: `Unknown event type: ${eventType}` });
       }
-      
+
+      // MESSAGE_SENT alleen bevestigen: géén databaserij per los bericht
+      if (eventType !== "MESSAGE_SENT") {
+        const clean = (v: unknown, max: number) =>
+          typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null;
+        const num = (v: unknown) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : 0);
+
+        await db.insert(analyticsEvents).values({
+          appName: event.appName === "opvoedmaatje" ? "opvoedmaatje" : "matti",
+          timestamp: new Date(event.timestamp || Date.now()),
+          postalCodeArea: clean(event.postalCodeArea, 20) ?? clean(event.gemeente, 20) ?? "0000",
+          ageGroup: clean(event.ageGroup, 20) ?? clean(event.leeftijdsgroep, 20) ?? "unknown",
+          userType: event.userType === "ouder" ? "ouder" : "jongere",
+          familyType: ["eenouder", "tweeouder", "samengesteld"].includes(event.familyType) ? event.familyType : null,
+          themes: Array.isArray(event.themes) ? event.themes.slice(0, 10).map(String) : [],
+          sessionDuration: num(event.sessionDuration),
+          messageCount: num(event.messageCount),
+          isReturningUser: event.isReturningUser === true,
+          weeklyFrequency: 1,
+          satisfactionScore: event.satisfactionScore != null && Number.isFinite(Number(event.satisfactionScore)) ? Number(event.satisfactionScore) : null,
+          selfReportedImprovement: typeof event.selfReportedImprovement === "boolean" ? event.selfReportedImprovement : null,
+          isHighRisk: event.isHighRisk === true || eventType === "RISK_DETECTED",
+          safetySignal: event.safetySignal === true,
+          school: clean(event.school, 120),
+        });
+      }
+
       res.status(200).json({ success: true, eventType });
     } catch (error) {
       console.error("[Analytics Events API] Error:", error);

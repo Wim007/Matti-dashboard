@@ -2,6 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangeFilter, DateRangeValue } from "@/components/DateRangeFilter";
 import { AgeGroupFilter, AgeGroupValue } from "@/components/AgeGroupFilter";
+import { SchoolFilter, SchoolValue } from "@/components/SchoolFilter";
 import { trpc } from "@/lib/trpc";
 import { Activity, AlertTriangle, TrendingUp, Users, Euro, TrendingDown, Clock, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -16,12 +17,14 @@ export default function Dashboard() {
   });
 
   const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
+  const [school, setSchool] = useState<SchoolValue>('all');
 
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
     endDate: dateRange.to.toISOString(),
     ageGroup: ageGroup !== 'all' ? ageGroup : undefined,
-  }), [dateRange, ageGroup]);
+    school: school !== 'all' ? school : undefined,
+  }), [dateRange, ageGroup, school]);
 
   const { data: summary, isLoading } = trpc.analytics.getSummary.useQuery(queryDateRange);
   const { data: costAvoidance } = trpc.funding.getCostAvoidance.useQuery(queryDateRange);
@@ -96,6 +99,7 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <SchoolFilter value={school} onChange={setSchool} />
             <AgeGroupFilter value={ageGroup} onChange={setAgeGroup} />
             <DateRangeFilter value={dateRange} onChange={setDateRange} />
           </div>
