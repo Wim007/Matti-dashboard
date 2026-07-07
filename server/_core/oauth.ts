@@ -10,6 +10,48 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
+  // Wachtwoord-login: vervangt de Manus OAuth-portal (die niet meer
+  // bereikbaar is). Sessies blijven lokaal ondertekende JWT's, dus de
+  // rest van de auth-keten is ongewijzigd.
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    const configured = process.env.DASHBOARD_PASSWORD || "";
+    if (!configured) {
+      res.status(503).json({
+        error: "Login is niet geconfigureerd — zet de DASHBOARD_PASSWORD environment variable.",
+      });
+      return;
+    }
+
+    const password = req.body?.password;
+    if (typeof password !== "string" || password !== configured) {
+      res.status(401).json({ error: "Ongeldig wachtwoord" });
+      return;
+    }
+
+    try {
+      const openId = "dashboard-admin";
+      await db.upsertUser({
+        openId,
+        name: "Beheerder",
+        loginMethod: "password",
+        role: "admin",
+        lastSignedIn: new Date(),
+      });
+
+      const sessionToken = await sdk.createSessionToken(openId, {
+        name: "Beheerder",
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[Auth] Wachtwoord-login mislukt", error);
+      res.status(500).json({ error: "Inloggen mislukt. Probeer het opnieuw." });
+    }
+  });
+
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
