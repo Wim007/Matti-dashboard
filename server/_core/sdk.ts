@@ -256,86 +256,40 @@ class SDKServer {
     } as GetUserInfoWithJwtResponse;
   }
 
-  async authenticateRequest(req: Request): Promise<User> {
-    // Open modus: zolang er geen DASHBOARD_PASSWORD is geconfigureerd, is het
-    // dashboard vrij toegankelijk en telt elke bezoeker als beheerder. Geen
-    // wachtwoord, geen sessie-cookie en geen JWT_SECRET nodig. Zet de env var
-    // DASHBOARD_PASSWORD om het dashboard weer af te schermen.
-    if (!process.env.DASHBOARD_PASSWORD) {
-      const openId = "dashboard-admin";
-      let user = await db.getUserByOpenId(openId);
-      if (!user) {
-        try {
-          await db.upsertUser({
-            openId,
-            name: "Beheerder",
-            loginMethod: "open",
-            role: "admin",
-            lastSignedIn: new Date(),
-          });
-          user = await db.getUserByOpenId(openId);
-        } catch {
-          // database niet beschikbaar — val hieronder terug op een synthetische gebruiker
-        }
-      }
-      // Ook zonder database toegang geven: de dataqueries geven dan hun
-      // eigen foutmeldingen i.p.v. een eeuwige inlog-loop
-      return (
-        user ?? ({
-          id: 0,
-          openId,
-          name: "Beheerder",
-          email: null,
-          loginMethod: "open",
-          role: "admin",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          lastSignedIn: new Date(),
-        } as User)
-      );
-    }
-
-    // Regular authentication flow
-    const cookies = this.parseCookies(req.headers.cookie);
-    const sessionCookie = cookies.get(COOKIE_NAME);
-    const session = await this.verifySession(sessionCookie);
-
-    if (!session) {
-      throw ForbiddenError("Invalid session cookie");
-    }
-
-    const sessionUserId = session.openId;
-    const signedInAt = new Date();
-    let user = await db.getUserByOpenId(sessionUserId);
-
-    // If user not in DB, sync from OAuth server automatically
+  async authenticateRequest(_req: Request): Promise<User> {
+    // Het dashboard is volledig open: elke bezoeker telt als beheerder.
+    // Geen wachtwoord, geen sessie-cookie en geen JWT_SECRET nodig.
+    const openId = "dashboard-admin";
+    let user = await db.getUserByOpenId(openId);
     if (!user) {
       try {
-        const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
         await db.upsertUser({
-          openId: userInfo.openId,
-          name: userInfo.name || null,
-          email: userInfo.email ?? null,
-          loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-          lastSignedIn: signedInAt,
+          openId,
+          name: "Beheerder",
+          loginMethod: "open",
+          role: "admin",
+          lastSignedIn: new Date(),
         });
-        user = await db.getUserByOpenId(userInfo.openId);
-      } catch (error) {
-        console.error("[Auth] Failed to sync user from OAuth:", error);
-        throw ForbiddenError("Failed to sync user info");
+        user = await db.getUserByOpenId(openId);
+      } catch {
+        // database niet beschikbaar — val hieronder terug op een synthetische gebruiker
       }
     }
-
-    if (!user) {
-      throw ForbiddenError("User not found");
-    }
-
-    await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt,
-    });
-
-    return user;
+    // Ook zonder database toegang geven: de dataqueries geven dan hun
+    // eigen foutmeldingen i.p.v. een eeuwige inlog-loop
+    return (
+      user ?? ({
+        id: 0,
+        openId,
+        name: "Beheerder",
+        email: null,
+        loginMethod: "open",
+        role: "admin",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastSignedIn: new Date(),
+      } as User)
+    );
   }
 }
 
