@@ -37,6 +37,13 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
+  if (!process.env.JWT_SECRET) {
+    console.warn("[Auth] JWT_SECRET niet ingesteld — inloggen zal falen (sessies kunnen niet ondertekend worden)");
+  }
+  if (!process.env.DASHBOARD_PASSWORD) {
+    console.warn("[Auth] DASHBOARD_PASSWORD niet ingesteld — de wachtwoord-login is uitgeschakeld");
+  }
+
   const app = express();
   const server = createServer(app);
   // Configure body parser with larger size limit for file uploads
