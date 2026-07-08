@@ -56,6 +56,9 @@ async function ensureSchema() {
         await conn.query("ALTER TABLE analytics_events ADD COLUMN school VARCHAR(120) NULL");
         console.log("[Migrations] Kolom analytics_events.school toegevoegd");
       }
+      await conn.query(
+        "CREATE TABLE IF NOT EXISTS schools (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(120) NOT NULL UNIQUE, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)"
+      );
     } finally {
       await conn.end();
     }
@@ -94,6 +97,18 @@ async function startServer() {
       db: dbOk,
       ts: new Date().toISOString(),
     });
+  });
+
+  // Publieke scholenlijst (alleen namen) — gebruikt door de Matti-onboarding
+  // zodat leerlingen hun school uit het register kiezen i.p.v. vrij typen
+  app.get("/api/schools", async (_req, res) => {
+    try {
+      const { listRegisteredSchools } = await import("../db");
+      res.json({ schools: await listRegisteredSchools() });
+    } catch (err) {
+      console.error("[Schools API] Error:", err);
+      res.status(500).json({ schools: [] });
+    }
   });
 
   // OAuth callback under /api/oauth/callback

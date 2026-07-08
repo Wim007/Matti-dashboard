@@ -10,6 +10,7 @@ import { fundingRouter } from "./routers/funding";
 import { pdfRouter } from "./routers/pdf";
 import { themesRouter } from "./routers/themes";
 import { behaviorRouter } from "./routers/behavior";
+import { schoolsRouter } from "./routers/schools";
 
 export const appRouter = router({
   system: systemRouter,
@@ -30,6 +31,7 @@ export const appRouter = router({
   pdf: pdfRouter,
   apiKeys: apiKeysRouter,
   themes: themesRouter,
+  schools: schoolsRouter,
   behavior: behaviorRouter,
 });
 

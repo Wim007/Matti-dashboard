@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ApiKeys from "./pages/ApiKeys";
+import Schools from "./pages/Schools";
 import Demographics from "./pages/Demographics";
 import Engagement from "./pages/Engagement";
 import RiskAssessment from "./pages/RiskAssessment";
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/risk-assessment" component={RiskAssessment} />
       <Route path="/impact-report" component={ImpactReport} />
       <Route path="/themes" component={Themes} />
+      <Route path="/scholen" component={Schools} />
       <Route path="/api-keys" component={ApiKeys} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

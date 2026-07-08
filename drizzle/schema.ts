@@ -49,6 +49,19 @@ export const analyticsEvents = mysqlTable("analytics_events", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+/**
+ * Scholenregister — de canonieke lijst schoolnamen die scholen zelf beheren.
+ * Leerlingen kiezen in de Matti-onboarding uit deze lijst, zodat het label
+ * in de events altijd exact overeenkomt met het dashboardfilter.
+ */
+export const schools = mysqlTable("schools", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 120 }).notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type School = typeof schools.$inferSelect;
+
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type InsertAnalyticsEvent = typeof analyticsEvents.$inferInsert;
 

@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { analyticsEvents, apiKeys, InsertAnalyticsEvent, InsertApiKey, InsertUser, users } from "../drizzle/schema";
+import { analyticsEvents, apiKeys, InsertAnalyticsEvent, InsertApiKey, InsertUser, schools, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -175,18 +175,66 @@ export async function getAnalyticsSummary(filters?: {
   return result[0];
 }
 
-/** Alle scholen die in de events voorkomen — voor de schoolkiezer in het menu */
+/** Geregistreerde scholen (het beheerde register), alleen namen */
+export async function listRegisteredSchools(): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db.select({ name: schools.name }).from(schools);
+  return rows.map((r) => r.name).sort((a, b) => a.localeCompare(b, "nl"));
+}
+
+/**
+ * Alle scholen voor de dashboardfilter: het register plus labels die al in
+ * events voorkomen (bijv. vrij ingetypt vóór registratie)
+ */
 export async function getSchools(): Promise<string[]> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const rows = await db
+  const eventRows = await db
     .selectDistinct({ school: analyticsEvents.school })
     .from(analyticsEvents)
     .where(sql`${analyticsEvents.school} IS NOT NULL AND ${analyticsEvents.school} != ''`);
-  return rows
-    .map((r) => r.school)
-    .filter((v): v is string => !!v)
-    .sort((a, b) => a.localeCompare(b, "nl"));
+  const registered = await listRegisteredSchools();
+  const all = new Set<string>(registered);
+  for (const r of eventRows) if (r.school) all.add(r.school);
+  return Array.from(all).sort((a, b) => a.localeCompare(b, "nl"));
+}
+
+export async function createSchool(name: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(schools).values({ name });
+}
+
+/**
+ * Hernoemt een school en werkt ALLE bestaande events mee bij, zodat de
+ * historie onder de nieuwe naam zichtbaar blijft en losse spellingen
+ * samengevoegd kunnen worden.
+ */
+export async function renameSchool(oldName: string, newName: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Register bijwerken (upsert: hernoemen naar een bestaande naam = samenvoegen)
+  const existing = await db.select().from(schools).where(eq(schools.name, newName)).limit(1);
+  if (existing.length === 0) {
+    const oldRow = await db.select().from(schools).where(eq(schools.name, oldName)).limit(1);
+    if (oldRow.length > 0) {
+      await db.update(schools).set({ name: newName }).where(eq(schools.name, oldName));
+    } else {
+      await db.insert(schools).values({ name: newName });
+    }
+  } else {
+    await db.delete(schools).where(eq(schools.name, oldName));
+  }
+  // Historie mee laten verhuizen
+  await db.update(analyticsEvents).set({ school: newName }).where(eq(analyticsEvents.school, oldName));
+}
+
+export async function deleteSchool(name: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(schools).where(eq(schools.name, name));
+  // Events behouden hun label; alleen het register-item verdwijnt
 }
 
 // API Keys

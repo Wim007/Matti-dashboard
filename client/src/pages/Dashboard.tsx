@@ -17,7 +17,15 @@ export default function Dashboard() {
   });
 
   const [ageGroup, setAgeGroup] = useState<AgeGroupValue>('all');
-  const [school, setSchool] = useState<SchoolValue>('all');
+  // ?school=... in de URL opent het dashboard direct gefilterd op die school
+  // (de deelbare link per school van de Scholen-pagina)
+  const [school, setSchool] = useState<SchoolValue>(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("school") || "all";
+    } catch {
+      return "all";
+    }
+  });
 
   const queryDateRange = useMemo(() => ({
     startDate: dateRange.from.toISOString(),
