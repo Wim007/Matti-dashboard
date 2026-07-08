@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BarChart3, FileText, Key, LayoutDashboard, LogOut, MessageSquare, PanelLeft, TrendingUp, Users } from "lucide-react";
+import { BarChart3, FileText, Key, LayoutDashboard, LogOut, MessageSquare, PanelLeft, TrendingUp, Users, School } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -34,6 +34,7 @@ const menuItems = [
   { icon: TrendingUp, label: "Betrokkenheid", path: "/engagement" },
   { icon: Users, label: "Risicobeoordeling", path: "/risk-assessment" },
   { icon: FileText, label: "Impact Rapport", path: "/impact-report" },
+  { icon: School, label: "Scholen", path: "/scholen" },
   { icon: Key, label: "API-sleutels", path: "/api-keys" },
 ];
 
